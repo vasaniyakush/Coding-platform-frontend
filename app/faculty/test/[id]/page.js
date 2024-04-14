@@ -19,6 +19,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import TestDetails from "@/components/TestDetails";
+
 // import InvitesList from "@/components/InvitesList";
 // import MemberTable from "@/components/MemberTable";
 import { Skeleton } from "@mui/material";
@@ -26,6 +27,7 @@ import api from "@/api";
 import Cookies from "js-cookie";
 // import CyclesTable from "@/components/CyclesTable";
 import { useAdminAuth } from "@/contexts/faculty-auth";
+// import QuestionsTable from "@/components/facultyQuestions";
 // import { mainListItems, secondaryListItems } from './listItems';
 // import Chart from './Chart';
 // import Deposits from './Deposits';
@@ -50,17 +52,10 @@ export default function Dashboard({ params }) {
       api.defaults.headers.Authorization = `Bearer ${token}`;
       try {
         const response = await api.get(`test/${params.id}`);
-        // console.log(response.data);
+        console.log(response.data);
         setDetails(response.data.data);
         // setOwnGroup(response.data.closedGroup.createdBy == user.data.uid);
         setDetailsLoading(false);
-        // console.log(response.data.closedGroup.createdBy,user.data.uid, user,response.data.closedGroup.createdBy == user.data.uid)
-        // const response2 = await api.get(
-        //   `closed-group/invite?closedgroupid=${params.id}`
-        // );
-        // console.log("hello", response2.data);
-        // setInvites(response2.data.invites);
-        // setInvitesLoading(false);
       } catch (error) {
         console.error("Error fetching closed groups:", error);
       } finally {
@@ -78,8 +73,8 @@ export default function Dashboard({ params }) {
       // }
     }
     setDetailsLoading(true);
-    setInvitesLoading(true);
-    setUsersLoading(true);
+    // setInvitesLoading(true);
+    // setUsersLoading(true);
     getTest();
   }, [refresh]);
 
@@ -112,62 +107,15 @@ export default function Dashboard({ params }) {
                     height: 240,
                   }}
                 >
-                  <TestDetails details={details} />
+                  <TestDetails
+                    details={details}
+                    // toggleRefresh={toggleRefresh}
+                  />
                 </Paper>
               )}
             </Grid>
-            {/* {ownGroup && !details.started && details.active && (
-              <Grid item xs={12} md={6} lg={6}>
-                {invitesLoading ? (
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    height={240}
-                    sx={{ mt: 0 }}
-                  ></Skeleton>
-                ) : (
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: 240,
-                    }}
-                  >
-                    <InvitesList
-                      toggleRefresh={toggleRefresh}
-                      name={"request"}
-                      invites={invites}
-                    />
-                  </Paper>
-                )}
-              </Grid>
-            )} */}
-            {/* {ownGroup && !details.started && details.active && (
-              <Grid item xs={12} md={6} lg={6}>
-                {invitesLoading ? (
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    height={240}
-                    sx={{ mt: 0 }}
-                  ></Skeleton>
-                ) : (
-                  <Paper
-                    sx={{
-                      p: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      height: 240,
-                    }}
-                  >
-                    <InvitesList name={"invite"} invites={invites} />
-                  </Paper>
-                )}
-              </Grid>
-            )} */}
 
-            {/* <Grid item xs={12}>
+            <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
                 <Typography
                   component="h2"
@@ -175,12 +123,12 @@ export default function Dashboard({ params }) {
                   color="primary"
                   gutterBottom
                 >
-                  Members
+                  Questions
                 </Typography>
-                <MemberTable groupId={params.id} />
+                {/* <QuestionsTable questions={details.Question} /> */}
               </Paper>
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
                 <CyclesTable />
               </Paper>

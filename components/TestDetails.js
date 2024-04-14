@@ -1,7 +1,16 @@
 // import { Title } from "@mui/icons-material";
-import { Chip, Divider, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import * as React from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import SendIcon from "@mui/icons-material/Send";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 export default function TestDetails(props) {
   const { details } = props;
 
@@ -15,6 +24,7 @@ export default function TestDetails(props) {
           <Typography component="p" variant="h4">
             {details.testName}
           </Typography>
+          <Divider></Divider>
         </Grid>
         <Grid item xs={2} md={2}>
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
@@ -34,7 +44,7 @@ export default function TestDetails(props) {
             <Chip
               variant="filled"
               color="warning"
-              size="medium"
+              size="large"
               label="Upcoming"
             />
           ) : details.status == "running" ? (
@@ -42,7 +52,7 @@ export default function TestDetails(props) {
           ) : (
             <Chip
               variant="filled"
-              size="medium"
+              size="large"
               color="success"
               label="Completed"
             />
@@ -53,7 +63,7 @@ export default function TestDetails(props) {
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
             Test Duration
           </Typography>
-          <Typography component="p" variant="h6">
+          <Typography component="p" variant="h5">
             {/* {details.FrontUser.Username} | {details.FrontUser.Phone} <Divider />{" "} */}
             {details.testDuration} minutes
           </Typography>
@@ -62,8 +72,8 @@ export default function TestDetails(props) {
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
             No. of Questions:
           </Typography>
-          <Typography component="p" variant="h6">
-            {details.numOfQuestion}
+          <Typography component="p" variant="h5">
+            {details.Question.length}
           </Typography>
         </Grid>
         <Grid item xs={2} md={2}>
@@ -71,17 +81,42 @@ export default function TestDetails(props) {
             Total Students
           </Typography>
           <Typography component="p" variant="h5">
-            {details.personLimit}
+            {details.User.length}
           </Typography>
         </Grid>
-        {/* <Grid item xs={3.5} md={3.5}>
+        <Grid item xs={4} md={4}>
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
-            Savings Goal
+            Actions:
           </Typography>
-          <Typography component="p" variant="h6">
-            ${details.savingGoal * 3} (${details.savingGoal} / payout)
-          </Typography>
-        </Grid> */}
+          <Button variant="contained" endIcon={<AddCircleIcon />} size="medium">
+            Add Question
+          </Button>
+          {/* </Grid>
+        <Grid item xs={2} md={2}> */}
+          {details.status == "upcoming" ? (
+            <Button
+              variant="contained"
+              color="warning"
+              endIcon={<SendIcon />}
+              size="medium"
+              sx={{ ml: 3 }}
+            >
+              Start Test
+            </Button>
+          ) : details.status == "running" ? (
+            <Button
+              variant="contained"
+              color="error"
+              endIcon={<SendIcon />}
+              size="medium"
+              sx={{ ml: 3 }}
+            >
+              Finish Test
+            </Button>
+          ) : (
+            <></>
+          )}
+        </Grid>
       </Grid>
     </>
   );
