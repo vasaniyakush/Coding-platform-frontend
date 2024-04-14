@@ -1,15 +1,8 @@
 import React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
-import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import {
   Alert,
@@ -17,9 +10,6 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Snackbar,
   TextField,
 } from "@mui/material";
@@ -27,10 +17,27 @@ import AceEditor from "react-ace";
 import { decodeFromBase64, encodeToBase64 } from "@/utils";
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-github";
+import api from "@/api";
 
 function LeftPanel(data) {
+  // console.log(data, data?.statement)
+  const [htmlCode, setHtmlCode] = React.useState(decodeFromBase64(data?.data?.statement));
+
+  const handleSave = async () => {
+    try {
+      const encodedHtmlCode = encodeToBase64(htmlCode);
+      await api.put(`/question/${data?.data?.id}`, {
+        testId: data.data?.testId,
+        statement: encodedHtmlCode,
+      });
+      console.log("Question data updated successfully!");
+    } catch (error) {
+      console.error("Error updating question data:", error);
+    }
+  };
+
   return (
-    <Box sx={{ width: "50%", padding: "16px", overflowY: "scroll" }}>
+    <Box sx={{ width: "50%", maxHeight: '70vh', padding: "16px", overflowY: "auto" }}>
       <Typography variant="h6" mb={2}>
         HTML Code Editor
       </Typography>
@@ -39,25 +46,101 @@ function LeftPanel(data) {
         theme="github"
         width="100%"
         height="80vh"
-        value={decodeFromBase64(data?.data)}
+        value={htmlCode}
+        onChange={(newValue) => setHtmlCode(newValue)}
       />
+      <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>
+        Save
+      </Button>
     </Box>
   );
 }
 
+
+// function TestCaseCard({ testCase, onSave }) {
+//   const [input, setInput] = React.useState(testCase.input);
+//   const [output, setOutput] = React.useState(testCase.output);
+//   const [hidden, setHidden] = React.useState(testCase.hidden);
+
+//   const handleSave = () => {
+//     onSave({
+//       ...testCase,
+//       input,
+//       output,
+//       hidden,
+//     });
+//   };
+
+//   return (
+//     <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+//       <Grid container spacing={2} alignItems="center">
+//         <Grid item xs={12}>
+//           <Typography variant="h6">Test Case</Typography>
+//         </Grid>
+//         <Grid item xs={12}>
+//           <TextField
+//             label="Input"
+//             fullWidth
+//             value={input}
+//             onChange={(e) => setInput(e.target.value)}
+//           />
+//         </Grid>
+//         <Grid item xs={12}>
+//           <TextField
+//             label="Output"
+//             fullWidth
+//             value={output}
+//             onChange={(e) => setOutput(e.target.value)}
+//           />
+//         </Grid>
+//         <Grid item xs={12}>
+//           <FormControlLabel
+//             control={
+//               <Checkbox
+//                 checked={hidden}
+//                 onChange={(e) => setHidden(e.target.checked)}
+//               />
+//             }
+//             label="Hidden"
+//           />
+//         </Grid>
+//         <Grid item xs={12}>
+//           <Button variant="contained" onClick={handleSave}>
+//             Save
+//           </Button>
+//         </Grid>
+//       </Grid>
+//     </Paper>
+//   );
+// }
 function TestCaseCard({ testCase, onSave }) {
   const [input, setInput] = React.useState(testCase.input);
   const [output, setOutput] = React.useState(testCase.output);
   const [hidden, setHidden] = React.useState(testCase.hidden);
+  const [editMode, setEditMode] = React.useState(false);
 
-  const handleSave = () => {
-    onSave({
-      ...testCase,
-      input,
-      output,
-      hidden,
-    });
+
+  const handleSave = async () => {
+    try {
+      await api.put(`/testcase/${testCase.id}`, {
+        input,
+        output,
+        hidden,
+      });
+      if (typeof onSave === 'function') {
+        onSave({
+          ...testCase,
+          input,
+          output,
+          hidden,
+        });
+        setEditMode(false)
+      }
+    } catch (error) {
+      console.error("Error updating test case:", error);
+    }
   };
+
 
   return (
     <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
@@ -71,6 +154,7 @@ function TestCaseCard({ testCase, onSave }) {
             fullWidth
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            disabled={!editMode}
           />
         </Grid>
         <Grid item xs={12}>
@@ -79,6 +163,7 @@ function TestCaseCard({ testCase, onSave }) {
             fullWidth
             value={output}
             onChange={(e) => setOutput(e.target.value)}
+            disabled={!editMode}
           />
         </Grid>
         <Grid item xs={12}>
@@ -87,15 +172,22 @@ function TestCaseCard({ testCase, onSave }) {
               <Checkbox
                 checked={hidden}
                 onChange={(e) => setHidden(e.target.checked)}
+                disabled={!editMode}
               />
             }
             label="Hidden"
           />
         </Grid>
         <Grid item xs={12}>
-          <Button variant="contained" onClick={handleSave}>
-            Save
-          </Button>
+          {editMode ? (
+            <Button variant="contained" onClick={handleSave}>
+              Save
+            </Button>
+          ) : (
+            <Button variant="contained" onClick={() => setEditMode(true)}>
+              Edit
+            </Button>
+          )}
         </Grid>
       </Grid>
     </Paper>
@@ -105,7 +197,7 @@ function TestCaseCard({ testCase, onSave }) {
 
 function RightPanel(data) {
   return (
-    <Box sx={{ width: "50%", padding: "16px", overflowY: "scroll" }}>
+    <Box sx={{ width: "50%", maxHeight: '70vh', padding: "16px", overflowY: "scroll" }}>
       <Typography variant="h6" mb={2}>
         Test Cases
       </Typography>
@@ -131,8 +223,8 @@ export default function AddClosedGroupModal(props) {
   };
 
   return (
-    <React.Fragment>
-      <Container maxWidth="xl" sx={{ mb: 4 }}>
+    <>
+      <Container maxWidth="xl" sx={{ mb: 4, maxHeight: '80vh' }}>
         <Paper
           variant="outlined"
           sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
@@ -142,7 +234,7 @@ export default function AddClosedGroupModal(props) {
           </Typography>
           <Divider />
           <Grid container spacing={0}>
-            <LeftPanel data={currentdata.statement} />
+            <LeftPanel data={currentdata} />
             <RightPanel data={currentdata?.TestCase} />
           </Grid>
           <Button
@@ -154,9 +246,9 @@ export default function AddClosedGroupModal(props) {
           >
             Cancel
           </Button>
-          <Button variant="contained" sx={{ mt: 3, ml: 1 }}>
+          {/* <Button variant="contained" sx={{ mt: 3, ml: 1 }}>
             Submit
-          </Button>
+          </Button> */}
           <Snackbar
             open={open}
             autoHideDuration={6000}
@@ -174,6 +266,6 @@ export default function AddClosedGroupModal(props) {
           </Snackbar>
         </Paper>
       </Container>
-    </React.Fragment>
+    </>
   );
 }
