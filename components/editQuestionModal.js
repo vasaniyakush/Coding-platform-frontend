@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -14,6 +14,8 @@ import Typography from "@mui/material/Typography";
 import {
   Alert,
   Divider,
+  Checkbox,
+  FormControlLabel,
   Grid,
   InputLabel,
   MenuItem,
@@ -21,53 +23,102 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material";
-// import PaymentForm from './PaymentForm';
-// import Review from './Review';
+import AceEditor from "react-ace";
+import { decodeFromBase64, encodeToBase64 } from "@/utils";
+import "ace-builds/src-noconflict/mode-html";
+import "ace-builds/src-noconflict/theme-github";
 
-function Copyright() {
+function LeftPanel(data) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
+    <Box sx={{ width: "50%", padding: "16px", overflowY: "scroll" }}>
+      <Typography variant="h6" mb={2}>
+        HTML Code Editor
+      </Typography>
+      <AceEditor
+        mode="html"
+        theme="github"
+        width="100%"
+        height="80vh"
+        value={decodeFromBase64(data?.data)}
+      />
+    </Box>
   );
 }
 
-const steps = ["Group Details"];
+function TestCaseCard({ testCase, onSave }) {
+  const [input, setInput] = React.useState(testCase.input);
+  const [output, setOutput] = React.useState(testCase.output);
+  const [hidden, setHidden] = React.useState(testCase.hidden);
+
+  const handleSave = () => {
+    onSave({
+      ...testCase,
+      input,
+      output,
+      hidden,
+    });
+  };
+
+  return (
+    <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12}>
+          <Typography variant="h6">Test Case</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Input"
+            fullWidth
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Output"
+            fullWidth
+            value={output}
+            onChange={(e) => setOutput(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={hidden}
+                onChange={(e) => setHidden(e.target.checked)}
+              />
+            }
+            label="Hidden"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant="contained" onClick={handleSave}>
+            Save
+          </Button>
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+}
+
+
+function RightPanel(data) {
+  return (
+    <Box sx={{ width: "50%", padding: "16px", overflowY: "scroll" }}>
+      <Typography variant="h6" mb={2}>
+        Test Cases
+      </Typography>
+      {data?.data?.map((testCase) => (
+        <TestCaseCard key={testCase.id} testCase={testCase} onSave={console.log} />
+      ))}
+    </Box>
+  );
+}
 
 export default function AddClosedGroupModal(props) {
-  const { setAddUserOpen, refresh } = props;
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [personLimit, setPersonLimit] = React.useState(0);
-  const [roundDuration, setRoundDuration] = React.useState(0);
-  //   const { handleNext, setAddUserOpen, refresh } = props;
-  //   const [personLimit, setpersonLimit] = React.useState(0);
-  const handlePersonLimitChange = (e) => {
-    setpersonLimit(parseInt(e.target.value));
-  };
-  const [payoutDuration, setpayoutDuration] = React.useState(0);
-  const handlepayoutDurationChange = (e) => {
-    setpayoutDuration(parseInt(e.target.value));
-  };
-  const [savingGoal, setsavingGoal] = React.useState(0);
-  const handlesavingGoalChange = (e) => {
-    setsavingGoal(parseInt(e.target.value));
-  };
-
-  const [name, setName] = React.useState("");
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-
-  const [type, setType] = React.useState("public");
-  const handleTypeChange = (e) => {
-    setType(e.target.value);
-  };
-
+  const { setAddUserOpen, currentdata } = props;
+  // console.log(setAddUserOpen, currentdata)
   const [err, setErr] = React.useState(0);
   const [open, setOpen] = React.useState(false);
 
@@ -87,117 +138,12 @@ export default function AddClosedGroupModal(props) {
           sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
         >
           <Typography component="h1" variant="h4" align="center">
-            Create Closed Group
+            Edit Question Data
           </Typography>
-          <Divider></Divider>
-          {/* <React.Fragment> */}
-          <Typography variant="h6" mb={0}>
-            Name
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={8} sm={8}>
-              <TextField
-                required
-                id="name"
-                value={name}
-                onChange={handleNameChange}
-                name="name"
-                placeholder="Closed group name . . ."
-                // label="Group Name"
-                fullWidth
-                // autoComplete="given-name"
-                variant="standard"
-              />
-            </Grid>
-
-            {/* PERSON LIMIT */}
-
-            <Grid item xs={8} sm={8}>
-              <InputLabel variant="standard" htmlFor="select-person-limit">
-                <Typography variant="h6" mb={0}>
-                  Group Size
-                </Typography>
-              </InputLabel>
-              <Select
-                // labelId="demo-simple-select-label"
-                id="select-person-limit"
-                placeholder="Select a Group Size"
-                value={personLimit}
-                fullWidth={true}
-                label="PersonLimit"
-                onChange={handlePersonLimitChange}
-              >
-                {/* {personLimits.map((val) => (
-                  <MenuItem key={val} value={val}>
-                    {val === 0 ? "Select Group Size..." : val + " People"}
-                  </MenuItem>
-                ))} */}
-              </Select>
-            </Grid>
-
-            <Grid item xs={8} sm={8}>
-              <InputLabel variant="standard" htmlFor="select-person-limit">
-                <Typography variant="h6" mb={0}>
-                  Contribution Amount (per payout)
-                </Typography>
-              </InputLabel>
-              <Select
-                id="select-saving-goal"
-                value={savingGoal}
-                fullWidth={true}
-                label="Saving Goal"
-                onChange={handlesavingGoalChange}
-              >
-                {/* {savingGoals.map((val) => (
-                  <MenuItem key={val} value={val}>
-                    {val === 0 ? "Select Contribution Amount..." : "$" + val}
-                  </MenuItem>
-                ))} */}
-              </Select>
-            </Grid>
-            <Grid item xs={8} sm={8}>
-              <InputLabel variant="standard" htmlFor="select-person-limit">
-                <Typography variant="h6" mb={0}>
-                  Payout Duration (Days)
-                </Typography>
-              </InputLabel>
-              <Select
-                id="select-payout-durations"
-                value={payoutDuration}
-                fullWidth={true}
-                label="Saving Goal"
-                onChange={handlepayoutDurationChange}
-              >
-                {/* {payoutDurations.map((val) => (
-                  <MenuItem key={val} value={val}>
-                    {val === 0 ? "Select Payout Duration..." : val + " Days"}
-                  </MenuItem>
-                ))} */}
-              </Select>
-            </Grid>
-            <Grid item xs={8} sm={8}>
-              <InputLabel variant="standard" htmlFor="select-person-limit">
-                <Typography variant="h6" mb={0}>
-                  Type
-                </Typography>
-              </InputLabel>
-              <Select
-                id="select-payout-durations"
-                value={type}
-                fullWidth={true}
-                label="Saving Goal"
-                onChange={handleTypeChange}
-              >
-                {/* {payoutDurations.map((val) => ( */}
-                <MenuItem key={"public"} value={"public"}>
-                  {"Public"}
-                </MenuItem>
-                <MenuItem key={"private"} value={"private"}>
-                  {"Private"}
-                </MenuItem>
-                {/* ))} */}
-              </Select>
-            </Grid>
+          <Divider />
+          <Grid container spacing={0}>
+            <LeftPanel data={currentdata.statement} />
+            <RightPanel data={currentdata?.TestCase} />
           </Grid>
           <Button
             variant="contained"
@@ -211,7 +157,6 @@ export default function AddClosedGroupModal(props) {
           <Button variant="contained" sx={{ mt: 3, ml: 1 }}>
             Submit
           </Button>
-          {/* </FormControl> */}
           <Snackbar
             open={open}
             autoHideDuration={6000}
@@ -227,9 +172,7 @@ export default function AddClosedGroupModal(props) {
               {err}
             </Alert>
           </Snackbar>
-          {/* </React.Fragment> */}
         </Paper>
-        {/* <Copyright /> */}
       </Container>
     </React.Fragment>
   );

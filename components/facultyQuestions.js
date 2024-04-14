@@ -44,22 +44,29 @@ export default function QuestionsTable(props) {
   //   const [users, setGroups] = useState([]);
   //   const [refresh, setRefresh] = useState(false);
   const [addUserOpen, setAddUserOpen] = useState(false);
+  const [currentdata, setCurrentdata] = useState({})
   //   const theme = useTheme();
-  const handleAddUserOpen = () => setAddUserOpen(true);
+  // console.log(props)
+  const handleAddUserOpen = (params) => {
+    setAddUserOpen(true)
+    setCurrentdata(params.row)
+  };
   const handleAddUserClose = () => setAddUserOpen(false);
   const theme = useTheme();
   const { questions } = props;
   console.log("QUESTIONS: ", questions);
+
   const columns = [
     {
       // field:"id",
 
       renderCell: (params) => {
+        // { console.log("params", params.row) }
         return (
           //   <Link target="_blank" href={"/closed-groups/" + params.row.id}>
           <Button
             onClick={() => {
-              handleAddUserOpen();
+              handleAddUserOpen(params);
             }}
             color="error"
           >
@@ -76,9 +83,24 @@ export default function QuestionsTable(props) {
       width: 400,
       valueGetter: (params) => `${decodeFromBase64(params.row.statement)}`,
     },
+    { field: "hiddenCount", headerName: "Hidden TestCases" },
+    { field: "totalcases", headerName: "Total TestCases" },
+    // {
+    //   renderCell: (params) => {
+    //     return (
+    //       <Button
+    //         onClick={() => {
+    //           handleAddUserOpen();
+    //         }}
+    //       >
+    //         Create testcases
+    //       </Button>
+    //     );
+    //   },
+    // },
   ];
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   return (
     <>
@@ -113,8 +135,8 @@ export default function QuestionsTable(props) {
       >
         <Box>
           <EditQuestionModal
-            setAddUserOpen={setAddUserOpen}
-            // refresh={toggleRefresh}
+            setAddUserOpen={setAddUserOpen} currentdata={currentdata}
+          // refresh={toggleRefresh}
           />
         </Box>
       </Modal>
