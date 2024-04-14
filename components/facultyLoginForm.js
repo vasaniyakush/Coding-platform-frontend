@@ -25,6 +25,7 @@ import React, { useState } from "react";
 import { useAdminAuth } from "@/contexts/faculty-auth";
 
 import CloseIcon from "@mui/icons-material/Close";
+import Link from "next/link";
 export default function LoginForm() {
   const [account, setAccount] = React.useState({ email: "", password: "" });
   const { login, loading } = useAdminAuth();
@@ -163,7 +164,7 @@ export default function LoginForm() {
               )}
 
               <Button
-                sx={{ mt: 3 }}
+                sx={{ mt: 3, mb: 1 }}
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -174,6 +175,21 @@ export default function LoginForm() {
               >
                 Sign In
               </Button>
+              <Divider />
+              <Link href="/">
+                <Button
+                  sx={{ mt: 1 }}
+                  type="submit"
+                  fullWidth
+                  variant="outlined"
+                  color="error"
+                  // disabled={loading}
+                  // className={classes.submit}
+                  // onClick={handelLogin}
+                >
+                  Go Back
+                </Button>
+              </Link>
               <Snackbar
                 open={open}
                 autoHideDuration={6000}

@@ -22,27 +22,11 @@ import Link from "next/link";
 import { decodeFromBase64 } from "@/utils";
 import EditQuestionModal from "@/components/editQuestionModal";
 // // AddClosedGroupModal
-function formatDateTime(datetime) {
-  const date = new Date(datetime);
-  const day = ("0" + date.getDate()).slice(-2);
-  const month = ("0" + (date.getMonth() + 1)).slice(-2);
-  const year = date.getFullYear();
-
-  let hours = date.getHours();
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  hours = hours ? hours : 12; // Handle midnight
-  const minutes = ("0" + date.getMinutes()).slice(-2);
-
-  const formattedDateTime = `${day}/${month}/${year} - ${hours}:${minutes} ${ampm}`;
-  return formattedDateTime;
-}
 
 export default function QuestionsTable(props) {
   //   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  //   const [users, setGroups] = useState([]);
-  //   const [refresh, setRefresh] = useState(false);
+
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [currentdata, setCurrentdata] = useState({})
   //   const theme = useTheme();

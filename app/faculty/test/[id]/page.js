@@ -25,28 +25,46 @@ import api from "@/api";
 import Cookies from "js-cookie";
 import { useAdminAuth } from "@/contexts/faculty-auth";
 import QuestionsTable from "@/components/facultyQuestions";
+import UsersTable from "@/components/facultyUsers";
+import SubmissionsTable from "@/components/facultySubmissions";
 
 export default function Dashboard({ params }) {
   const [detailsLoading, setDetailsLoading] = React.useState(true);
-  const [invitesLoading, setInvitesLoading] = React.useState(true);
-  const [usersLoading, setUsersLoading] = React.useState(true);
 
   const [details, setDetails] = React.useState({});
-  const [users, setUsers] = React.useState({});
-  const [invites, setInvites] = React.useState({});
+  const [submissions, setSubmisions] = React.useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const toggleRefresh = () => setRefresh(!refresh);
   const [ownGroup, setOwnGroup] = React.useState(false);
   const { login, loading, user } = useAdminAuth();
+
+  const fetchSubmissions = async () => {
+    try {
+      const response = await api.get(`submission/${params.id}`);
+      console.log("submission DATA: ", response.data);
+      setSubmissions(response.data);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+    }
+  };
+
+  // Effect to fetch submissions every 10 seconds
+  React.useEffect(() => {
+    const interval = setInterval(fetchSubmissions, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   React.useEffect(() => {
     async function getTest() {
       const token = Cookies.get("token");
       api.defaults.headers.Authorization = `Bearer ${token}`;
       try {
-        const response = await api.get(`test/${params.id}`);
+        let response = await api.get(`test/${params.id}`);
         console.log("TEST DATA: ", response.data);
         setDetails(response.data.data);
+        response = await api.get(`submission/${params.id}`);
+        console.log("submission DATA: ", response.data);
+        setSubmisions(response.data);
         // setOwnGroup(response.data.closedGroup.createdBy == user.data.uid);
         setDetailsLoading(false);
       } catch (error) {
@@ -57,7 +75,7 @@ export default function Dashboard({ params }) {
     setDetailsLoading(true);
 
     getTest();
-  }, []);
+  }, [refresh]);
 
   return (
     <Box sx={{ display: "flex", ml: 0 }}>
@@ -90,7 +108,7 @@ export default function Dashboard({ params }) {
                 >
                   <TestDetails
                     details={details}
-                    // toggleRefresh={toggleRefresh}
+                    toggleRefresh={toggleRefresh}
                   />
                 </Paper>
               )}
@@ -100,7 +118,7 @@ export default function Dashboard({ params }) {
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
                 <Typography
                   component="h2"
-                  variant="h6"
+                  variant="h5"
                   color="primary"
                   gutterBottom
                 >
@@ -109,6 +127,34 @@ export default function Dashboard({ params }) {
                 <QuestionsTable
                   questions={details?.Question ? details?.Question : []}
                 />
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                <Typography
+                  component="h2"
+                  variant="h5"
+                  color="primary"
+                  gutterBottom
+                >
+                  Students
+                </Typography>
+                <UsersTable users={details?.User ? details?.User : []} />
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                <Typography
+                  component="h2"
+                  variant="h5"
+                  color="primary"
+                  gutterBottom
+                >
+                  Student Scoreboard
+                </Typography>
+                <SubmissionsTable details={submissions} />
               </Paper>
             </Grid>
           </Grid>

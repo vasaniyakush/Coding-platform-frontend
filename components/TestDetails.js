@@ -11,8 +11,37 @@ import * as React from "react";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import api from "@/api";
 export default function TestDetails(props) {
-  const { details } = props;
+  const { details, toggleRefresh } = props;
+  const handleStartTest = async () => {
+    let data = JSON.stringify({
+      testName: details.name,
+      testDuration: details.testDuration,
+      numOfQuestion: details.numOfQuestion,
+      group: details.group,
+      status: "running",
+    });
+    await api.put(`/test/${details.id}`, data);
+
+    // api.post();
+
+    toggleRefresh();
+  };
+  const handleEndTest = async () => {
+    let data = JSON.stringify({
+      testName: details.name,
+      testDuration: details.testDuration,
+      numOfQuestion: details.numOfQuestion,
+      group: details.group,
+      status: "completed",
+    });
+    await api.put(`/test/${details.id}`, data);
+
+    // api.post();
+
+    toggleRefresh();
+  };
 
   return (
     <>
@@ -88,9 +117,15 @@ export default function TestDetails(props) {
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
             Actions:
           </Typography>
-          <Button variant="contained" endIcon={<AddCircleIcon />} size="medium">
-            Add Question
-          </Button>
+          {details.status == "upcoming" && (
+            <Button
+              variant="contained"
+              endIcon={<AddCircleIcon />}
+              size="medium"
+            >
+              Add Question
+            </Button>
+          )}
           {/* </Grid>
         <Grid item xs={2} md={2}> */}
           {details.status == "upcoming" ? (
@@ -100,6 +135,7 @@ export default function TestDetails(props) {
               endIcon={<SendIcon />}
               size="medium"
               sx={{ ml: 3 }}
+              onClick={handleStartTest}
             >
               Start Test
             </Button>
@@ -109,7 +145,8 @@ export default function TestDetails(props) {
               color="error"
               endIcon={<SendIcon />}
               size="medium"
-              sx={{ ml: 3 }}
+              onClick={handleEndTest}
+              // sx={{ ml: 3 }}
             >
               Finish Test
             </Button>
