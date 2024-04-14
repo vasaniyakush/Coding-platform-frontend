@@ -20,7 +20,7 @@ import api from "@/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { decodeFromBase64 } from "@/utils";
-// import EditQuestionModal from "@/components/editQuestionModal";
+import EditQuestionModal from "@/components/editQuestionModal";
 // // AddClosedGroupModal
 function formatDateTime(datetime) {
   const date = new Date(datetime);
@@ -49,7 +49,7 @@ export default function QuestionsTable(props) {
   const handleAddUserClose = () => setAddUserOpen(false);
   const theme = useTheme();
   const { questions } = props;
-
+  console.log("QUESTIONS: ", questions);
   const columns = [
     {
       // field:"id",
@@ -57,7 +57,12 @@ export default function QuestionsTable(props) {
       renderCell: (params) => {
         return (
           //   <Link target="_blank" href={"/closed-groups/" + params.row.id}>
-          <Button onClick={() => handleAddUserOpen()} color="error">
+          <Button
+            onClick={() => {
+              handleAddUserOpen();
+            }}
+            color="error"
+          >
             Edit
           </Button>
           //   </Link>
@@ -100,7 +105,7 @@ export default function QuestionsTable(props) {
           />
         </ThemeProvider>
       </Box>
-      {/* <Modal
+      <Modal
         open={addUserOpen}
         onClose={handleAddUserClose}
         aria-labelledby="modal-modal-title"
@@ -112,7 +117,7 @@ export default function QuestionsTable(props) {
             // refresh={toggleRefresh}
           />
         </Box>
-      </Modal> */}
+      </Modal>
       {/* </Container> */}
     </>
   );

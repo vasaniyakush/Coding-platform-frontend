@@ -20,18 +20,11 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import TestDetails from "@/components/TestDetails";
 
-// import InvitesList from "@/components/InvitesList";
-// import MemberTable from "@/components/MemberTable";
 import { Skeleton } from "@mui/material";
 import api from "@/api";
 import Cookies from "js-cookie";
-// import CyclesTable from "@/components/CyclesTable";
 import { useAdminAuth } from "@/contexts/faculty-auth";
-// import QuestionsTable from "@/components/facultyQuestions";
-// import { mainListItems, secondaryListItems } from './listItems';
-// import Chart from './Chart';
-// import Deposits from './Deposits';
-// import Orders from './Orders';
+import QuestionsTable from "@/components/facultyQuestions";
 
 export default function Dashboard({ params }) {
   const [detailsLoading, setDetailsLoading] = React.useState(true);
@@ -52,7 +45,7 @@ export default function Dashboard({ params }) {
       api.defaults.headers.Authorization = `Bearer ${token}`;
       try {
         const response = await api.get(`test/${params.id}`);
-        console.log(response.data);
+        console.log("TEST DATA: ", response.data);
         setDetails(response.data.data);
         // setOwnGroup(response.data.closedGroup.createdBy == user.data.uid);
         setDetailsLoading(false);
@@ -60,23 +53,11 @@ export default function Dashboard({ params }) {
         console.error("Error fetching closed groups:", error);
       } finally {
       }
-
-      // try {
-
-      //   // setOwnGroup(response.data.closedGroup.createdBy == user.data.uid)
-      //   // console.log(response.data.closedGroup.createdBy,user.data.uid, user,response.data.closedGroup.createdBy == user.data.uid)
-
-      // } catch (error) {
-      //   console.error("Error fetching closed groups:", error);
-      // } finally {
-      //   setInvitesLoading(false)
-      // }
     }
     setDetailsLoading(true);
-    // setInvitesLoading(true);
-    // setUsersLoading(true);
+
     getTest();
-  }, [refresh]);
+  }, []);
 
   return (
     <Box sx={{ display: "flex", ml: 0 }}>
@@ -125,14 +106,11 @@ export default function Dashboard({ params }) {
                 >
                   Questions
                 </Typography>
-                {/* <QuestionsTable questions={details.Question} /> */}
+                <QuestionsTable
+                  questions={details?.Question ? details?.Question : []}
+                />
               </Paper>
             </Grid>
-            {/* <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <CyclesTable />
-              </Paper>
-            </Grid> */}
           </Grid>
           {/* <Copyright sx={{ pt: 4 }} /> */}
         </Container>
