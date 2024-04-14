@@ -1,4 +1,4 @@
-import { decodeFromBase64, encodeToBase64 } from "@/utils";
+import { decodeFromBase64, encodeToBase64, getIPv4Addresses } from "@/utils";
 import {
   Button,
   Card,
@@ -12,6 +12,11 @@ import SendIcon from "@mui/icons-material/Send";
 import Link from "next/link";
 
 export default function Home({ openTab }) {
+  const networkInterfaces = getIPv4Addresses();
+  console.log("networkInterfaces: ", networkInterfaces);
+  const arr = Object.keys(networkInterfaces).map((address) => {
+    return `http://${networkInterfaces[address][0]}:3000/ `;
+  });
   return (
     <Grid container spacing={1}>
       <Grid item xs={6} md={6} lg={6}>
@@ -25,6 +30,7 @@ export default function Home({ openTab }) {
             <Typography gutterBottom variant="h5" component="div">
               Student Panel
             </Typography>
+
             <Typography variant="body2" color="text.secondary">
               Participate in Tests. Login or Sign Up as a new student.
             </Typography>
@@ -64,9 +70,26 @@ export default function Home({ openTab }) {
           </CardActions>
         </Card>
       </Grid>
-      {/* <Grid item xs={6} md={6} lg={6}>
-        <Card>{encodeToBase64("1")}</Card>
-      </Grid> */}
+      <Grid item xs={6} md={6} lg={6}>
+        <Card>
+          <CardContent>
+            {arr.map((address) => (
+              <Link key={address} href={address}>
+                <Typography
+                  sx={{
+                    textDecoration: "underline",
+                  }}
+                  gutterBottom
+                  variant="h5"
+                  component="div"
+                >
+                  <em>{address}</em>
+                </Typography>
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      </Grid>
     </Grid>
   );
 }

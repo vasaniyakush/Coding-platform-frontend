@@ -27,15 +27,17 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import React, { useEffect, useState } from "react";
 import { pink, red } from "@mui/material/colors";
 import { ThemeProvider } from "@emotion/react";
-import { useAdminAuth } from "@/contexts/faculty-auth";
-import { Avatar, Button, CardMedia } from "@mui/material";
-import LoginForm from "./facultyLoginForm";
+import { useStudentAuth } from "@/contexts/student-auth";
+import { Avatar, Button, CardMedia, Chip } from "@mui/material";
+import LoginForm from "./studentLoginForm";
 import Image from "next/image";
 import Link from "next/link";
 import skit_logo from "@/public/skit_logo.png";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { getIPv4Addresses } from "@/utils";
+import Cookies from "js-cookie";
+import api from "@/api";
 // import logo from "@public/images"
 
 const drawerWidth = 240;
@@ -123,136 +125,92 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function PageNav({ children }) {
-  const { isAuthenticated, isLoading, logout, openTab, setOpenTab } =
-    useAdminAuth();
+export default function PageNav({ children, params }) {
+  const { user, isAuthenticated, isLoading, logout, openTab, setOpenTab } =
+    useStudentAuth();
+  console.log("user", user);
+  const [open, setOpen] = React.useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const theme = useTheme();
-  const [open, setOpen] = React.useState(isAuthenticated);
-  const [address, setAddress] = React.useState([]);
-  // const [openTab, setOpenTab] = useState("dashboard");
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const toggleRefresh = () => {
+    console.log("CALLED");
+    setRefresh(!refresh);
   };
-  // console.log("ADDRESS: ", ipv4Addresses);
+  const [loading, setLoading] = useState(true);
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    async function getTests() {
+      const token = Cookies.get("token");
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      try {
+        let response = await api.get(`questions/${params.id}`);
+        console.log("TEST DATA: ", response.data);
+        setQuestions(response.data.data);
+        // setOwnGroup(response.data.closedGroup.createdBy == user.data.uid);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching closed groups:", error);
+      } finally {
+      }
+    }
+
+    setLoading(true);
+    getTests();
+  }, [refresh]);
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open && isAuthenticated}>
         <Toolbar>
-          {isAuthenticated && (
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{
-                marginRight: 5,
-                ...(open && { display: "none" }),
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-          <Typography variant="h6" noWrap component="div">
-            Faculty Panel
-          </Typography>
+          {isAuthenticated && <></>}
+          <Link href={`/student/test/${params.id}`}>
+            <Typography variant="h6" noWrap component="div">
+              Student Panel
+            </Typography>
+          </Link>
         </Toolbar>
       </AppBar>
       {isAuthenticated ? (
         <>
           <Drawer variant="permanent" open={open}>
-            <DrawerHeader>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === "rtl" ? (
-                  <>
-                    <ChevronRightIcon />
-                  </>
-                ) : (
-                  <>
-                    {console.log(skit_logo)}
-
-                    <Image
-                      src={skit_logo}
-                      width={50}
-                      height={50}
-                      alt="green iguana"
-                      style={{ left: "0" }}
-                    />
-                    <ChevronLeftIcon />
-                  </>
-                )}
-              </IconButton>
-            </DrawerHeader>
+            <DrawerHeader></DrawerHeader>
             <Divider />
             <List>
-              <Link href="/faculty">
-                <ListItem
-                  key={"Tests"}
-                  onClick={() => setOpenTab("Tests".toLowerCase())}
-                  disablePadding
-                  sx={{ display: "block" }}
-                >
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? "initial" : "center",
-                      px: 2.5,
-                    }}
+              {questions.map((ques, index) => {
+                return (
+                  <Link
+                    key={ques.id}
+                    href={`/student/test/${params.id}/${ques.id}`}
                   >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: open ? 3 : "auto",
-                        justifyContent: "center",
-                      }}
+                    <ListItem
+                      key={"Tests"}
+                      onClick={() => setOpenTab("Tests".toLowerCase())}
+                      disablePadding
+                      sx={{ display: "block" }}
                     >
-                      <AutoStoriesIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={"Tests"}
-                      sx={{ opacity: open ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-
-              <ListItem
-                key={"Options"}
-                onClick={() => setOpenTab("Options".toLowerCase())}
-                disablePadding
-                sx={{ display: "block" }}
-              >
-                <Link href="/faculty/options">
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? "initial" : "center",
-                      px: 2.5,
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: open ? 3 : "auto",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <SettingsIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={"Options"}
-                      sx={{ opacity: open ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </Link>
-              </ListItem>
+                      <ListItemButton
+                        sx={{
+                          minHeight: 48,
+                          justifyContent: open ? "initial" : "center",
+                          px: 1.5,
+                        }}
+                      >
+                        <Chip
+                          sx={{ alignSelf: "flex-start", ml: 0, mr: 0 }} // Align chip to the left
+                          label={`${index + 1}`}
+                          color="primary"
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                    <Divider></Divider>
+                  </Link>
+                );
+              })}
             </List>
-            <Divider />
+            {/* <Divider /> */}
             {open && (
               <ListItem
                 key={"Logout"}
@@ -293,7 +251,7 @@ export default function PageNav({ children }) {
       ) : (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
-          <LoginForm />
+          <LoginForm params={params} />
         </Box>
       )}
     </Box>
