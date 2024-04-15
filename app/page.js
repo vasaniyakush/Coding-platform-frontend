@@ -1,3 +1,4 @@
+"use client";
 import { decodeFromBase64, encodeToBase64, getIPv4Addresses } from "@/utils";
 import {
   Button,
@@ -17,6 +18,19 @@ export default function Home({ openTab }) {
   const arr = Object.keys(networkInterfaces).map((address) => {
     return `http://${networkInterfaces[address][0]}:3000/ `;
   });
+  const requestFullScreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
+  };
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={6} md={6} lg={6}>
@@ -88,6 +102,9 @@ export default function Home({ openTab }) {
               </Link>
             ))}
           </CardContent>
+          <Button variant="contained" onClick={requestFullScreen}>
+            Enter Fullscreen
+          </Button>
         </Card>
       </Grid>
     </Grid>

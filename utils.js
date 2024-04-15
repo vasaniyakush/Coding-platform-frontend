@@ -6,6 +6,7 @@ export function encodeToBase64(str) {
 
 // Function to decode a base64 string to a normal string
 export function decodeFromBase64(str) {
+  console.log("str", str);
   return decodeURIComponent(escape(atob(str)));
 }
 export function getIPv4Addresses() {

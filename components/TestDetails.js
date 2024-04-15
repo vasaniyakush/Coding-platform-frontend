@@ -1,10 +1,12 @@
-// import { Title } from "@mui/icons-material";
+"use client";
 import {
+  Box,
   Button,
   Chip,
   Divider,
   Grid,
   IconButton,
+  Modal,
   Typography,
 } from "@mui/material";
 import * as React from "react";
@@ -12,7 +14,10 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import api from "@/api";
+import AddQuestionModal from "./addQuestionModal";
 export default function TestDetails(props) {
+  const [addQuestionOpen, setAddQuestionOpen] = React.useState(false);
+
   const { details, toggleRefresh } = props;
   const handleStartTest = async () => {
     let data = JSON.stringify({
@@ -42,6 +47,11 @@ export default function TestDetails(props) {
 
     toggleRefresh();
   };
+
+  const handleAddQuestionOpen = () => {
+    setAddQuestionOpen(true);
+  };
+  const handleAddQuestionClose = () => setAddQuestionOpen(false);
 
   return (
     <>
@@ -122,6 +132,9 @@ export default function TestDetails(props) {
               variant="contained"
               endIcon={<AddCircleIcon />}
               size="medium"
+              onClick={() => {
+                handleAddQuestionOpen();
+              }}
             >
               Add Question
             </Button>
@@ -154,6 +167,21 @@ export default function TestDetails(props) {
             <></>
           )}
         </Grid>
+        <Modal
+          open={addQuestionOpen}
+          onClose={handleAddQuestionClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box>
+            <AddQuestionModal
+              setAddQuestionOpen={setAddQuestionOpen}
+              // currentdata={currentdata}
+              toggleRefresh={toggleRefresh}
+              // refresh={toggleRefresh}
+            />
+          </Box>
+        </Modal>
       </Grid>
     </>
   );

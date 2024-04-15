@@ -38,6 +38,8 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { getIPv4Addresses } from "@/utils";
 import Cookies from "js-cookie";
 import api from "@/api";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useRouter } from "next/navigation";
 // import logo from "@public/images"
 
 const drawerWidth = 240;
@@ -126,6 +128,8 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function PageNav({ children, params }) {
+  const router = useRouter();
+
   const { user, isAuthenticated, isLoading, logout, openTab, setOpenTab } =
     useStudentAuth();
   console.log("user", user);
@@ -159,6 +163,12 @@ export default function PageNav({ children, params }) {
     setLoading(true);
     getTests();
   }, [refresh]);
+  const handleGoBack = () => {
+    const confirmed = window.confirm("Are you sure you want to go back?");
+    if (confirmed) {
+      router.push("/student/");
+    }
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -171,6 +181,17 @@ export default function PageNav({ children, params }) {
               Student Panel
             </Typography>
           </Link>
+          {/* <Link href={"/"} style={{ marginLeft: "auto" }}> */}
+          <Button
+            sx={{ marginLeft: "auto" }}
+            color="inherit"
+            variant="outlined"
+            endIcon={<ArrowBackIcon />}
+            onClick={handleGoBack}
+          >
+            Go Back
+          </Button>
+          {/* </Link> */}
         </Toolbar>
       </AppBar>
       {isAuthenticated ? (

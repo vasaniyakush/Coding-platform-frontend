@@ -7,7 +7,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { THEME_ID, createTheme, styled, useTheme } from "@mui/material/styles";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ThemeProvider } from "@emotion/react";
 // import PageNav from "@/components/PageNav";
 // import { AuthProvider, ProtectRoute } from "@/contexts/auth";

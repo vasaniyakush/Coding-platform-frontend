@@ -49,10 +49,6 @@ export default function Dashboard({ params }) {
   };
 
   // Effect to fetch submissions every 10 seconds
-  React.useEffect(() => {
-    const interval = setInterval(fetchSubmissions, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   React.useEffect(() => {
     async function getTest() {
@@ -126,6 +122,7 @@ export default function Dashboard({ params }) {
                 </Typography>
                 <QuestionsTable
                   questions={details?.Question ? details?.Question : []}
+                  toggleRefresh={toggleRefresh}
                 />
               </Paper>
             </Grid>

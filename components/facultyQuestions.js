@@ -21,23 +21,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { decodeFromBase64 } from "@/utils";
 import EditQuestionModal from "@/components/editQuestionModal";
+import AddQuestionModal from "./addQuestionModal";
+
 // // AddClosedGroupModal
 
 export default function QuestionsTable(props) {
   //   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  const [addUserOpen, setAddUserOpen] = useState(false);
-  const [currentdata, setCurrentdata] = useState({})
+  const [editQuestionOpen, setEditQuestionOpen] = useState(false);
+  const [currentdata, setCurrentdata] = useState({});
   //   const theme = useTheme();
   // console.log(props)
-  const handleAddUserOpen = (params) => {
-    setAddUserOpen(true)
-    setCurrentdata(params.row)
+  const handleEditQuestionOpen = (params) => {
+    setEditQuestionOpen(true);
+    setCurrentdata(params.row);
   };
-  const handleAddUserClose = () => setAddUserOpen(false);
+
+  const handleEditQuestionClose = () => setEditQuestionOpen(false);
   const theme = useTheme();
-  const { questions } = props;
+  const { questions, toggleRefresh } = props;
   console.log("QUESTIONS: ", questions);
 
   const columns = [
@@ -50,7 +53,7 @@ export default function QuestionsTable(props) {
           //   <Link target="_blank" href={"/closed-groups/" + params.row.id}>
           <Button
             onClick={() => {
-              handleAddUserOpen(params);
+              handleEditQuestionOpen(params);
             }}
             color="error"
           >
@@ -74,7 +77,7 @@ export default function QuestionsTable(props) {
     //     return (
     //       <Button
     //         onClick={() => {
-    //           handleAddUserOpen();
+    //           handleEditQuestionOpen();
     //         }}
     //       >
     //         Create testcases
@@ -84,7 +87,7 @@ export default function QuestionsTable(props) {
     // },
   ];
 
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -112,18 +115,21 @@ export default function QuestionsTable(props) {
         </ThemeProvider>
       </Box>
       <Modal
-        open={addUserOpen}
-        onClose={handleAddUserClose}
+        open={editQuestionOpen}
+        onClose={handleEditQuestionClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box>
           <EditQuestionModal
-            setAddUserOpen={setAddUserOpen} currentdata={currentdata}
-          // refresh={toggleRefresh}
+            setEditQuestionOpen={setEditQuestionOpen}
+            currentdata={currentdata}
+            toggleRefresh={toggleRefresh}
+            // refresh={toggleRefresh}
           />
         </Box>
       </Modal>
+
       {/* </Container> */}
     </>
   );

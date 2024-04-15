@@ -19,11 +19,9 @@ import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-github";
 import api from "@/api";
 
-function LeftPanel(data) {
+function LeftPanel() {
   // console.log(data, data?.statement)
-  const [htmlCode, setHtmlCode] = React.useState(
-    decodeFromBase64(data?.data?.statement)
-  );
+  const [htmlCode, setHtmlCode] = React.useState();
 
   const handleSave = async () => {
     try {
@@ -49,7 +47,7 @@ function LeftPanel(data) {
     >
       <Box sx={{ display: "flex", alignItems: "center", width: "100%", mb: 1 }}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Edit Question Statement
+          Add Question Statement:
         </Typography>
         <Button variant="contained" onClick={handleSave} sx={{ ml: 2 }}>
           Save
@@ -228,9 +226,9 @@ function RightPanel(data) {
   );
 }
 
-export default function AddClosedGroupModal(props) {
-  const { setEditQuestionOpen, currentdata, toggleRefresh } = props;
-  // console.log(setEditQuestionOpen, currentdata)
+export default function AddQuestionModal(props) {
+  const { setAddQuestionOpen, toggleRefresh } = props;
+  // console.log(setAddUserOpen, currentdata)
   const [err, setErr] = React.useState(0);
   const [open, setOpen] = React.useState(false);
 
@@ -254,16 +252,16 @@ export default function AddClosedGroupModal(props) {
           </Typography>
           <Divider />
           <Grid container spacing={0}>
-            <LeftPanel data={currentdata} />
-            <RightPanel
+            <LeftPanel />
+            {/* <RightPanel
               toggleRefresh={toggleRefresh}
               data={currentdata?.TestCase}
-            />
+            /> */}
           </Grid>
           <Button
             variant="contained"
             onClick={() => {
-              setEditQuestionOpen(false);
+              setAddUserOpen(false);
             }}
             sx={{ mt: 3, ml: 1 }}
           >
