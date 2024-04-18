@@ -159,7 +159,7 @@ export default function TestDetails(props) {
               endIcon={<SendIcon />}
               size="medium"
               onClick={handleEndTest}
-              // sx={{ ml: 3 }}
+            // sx={{ ml: 3 }}
             >
               Finish Test
             </Button>
@@ -176,9 +176,9 @@ export default function TestDetails(props) {
           <Box>
             <AddQuestionModal
               setAddQuestionOpen={setAddQuestionOpen}
-              // currentdata={currentdata}
+              testId={details?.id}
               toggleRefresh={toggleRefresh}
-              // refresh={toggleRefresh}
+            // refresh={toggleRefresh}
             />
           </Box>
         </Modal>

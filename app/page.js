@@ -84,7 +84,7 @@ export default function Home({ openTab }) {
           </CardActions>
         </Card>
       </Grid>
-      <Grid item xs={6} md={6} lg={6}>
+      {/* <Grid item xs={6} md={6} lg={6}>
         <Card>
           <CardContent>
             {arr.map((address) => (
@@ -102,11 +102,8 @@ export default function Home({ openTab }) {
               </Link>
             ))}
           </CardContent>
-          <Button variant="contained" onClick={requestFullScreen}>
-            Enter Fullscreen
-          </Button>
         </Card>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }

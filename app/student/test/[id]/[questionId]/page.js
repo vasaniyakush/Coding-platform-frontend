@@ -14,6 +14,8 @@ import {
   AppBar,
   Box,
   Button,
+  Card,
+  CardContent,
   Chip,
   Container,
   CssBaseline,
@@ -57,12 +59,41 @@ import {
   langs_ids,
   statuses,
 } from "@/constants";
-import { decodeFromBase64 } from "@/utils";
+import { decodeFromBase64, encodeToBase64 } from "@/utils";
 import Cookies from "js-cookie";
 import api from "@/api";
+import { useStudentAuth } from "@/contexts/student-auth";
 // import { BorderColor } from "@mui/icons-material";
 
+const TestCaseCard = ({ testCase, index }) => {
+  return (
+    <Card variant="outlined" key={index} sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Case {index + 1}
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          Status: {testCase.status}
+        </Typography>
+        <Divider />
+        <Typography variant="body2" mt={2}>
+          Input: {decodeFromBase64(testCase.input)}
+        </Typography>
+        <Typography variant="body2" mt={2}>
+          Expected Output: {decodeFromBase64(testCase.output)}
+        </Typography>
+        <Typography variant="body2" mt={2}>
+          {/* Your Output: {testCase.your_output && decodeFromBase64(testCase.your_output)} */}
+          Your Output: {testCase.your_output && testCase.your_output}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
+
+
 export default function Home({ params }) {
+  const { user } = useStudentAuth()
   const [lang, setLang] = useState(langs[0]);
   const [selectVal, setSelectVal] = useState(1);
   const [cCode, setCCode] = useLocalStorage(
@@ -130,6 +161,25 @@ export default function Home({ params }) {
         input: customTestcase,
       });
 
+      const token = Cookies.get("token");
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      try {
+        const response = await api.post("submission/run");
+        console.log(response.data);
+        let resultObj = {}
+        response.data[0].submission_result.compile_output ? (resultObj["Compile Error"] = decodeFromBase64(response.data[0].submission_result.compile_output)) : (
+
+          response.data.map((sub, index) => {
+            resultObj[`Case ${index + 1}`] = { "status": sub.submission_result.status.description, "input": sub.input_data, "output": sub.output_data, "your_output": decodeFromBase64(sub.submission_result.stdout) }
+          })
+        )
+        setResult(JSON.stringify(resultObj))
+        setAlignment()
+      } catch (error) {
+        console.error("Error fetching closed groups:", error);
+      } finally {
+        // setLoading(false);
+      }
       let config = {
         method: "post",
         maxBodyLength: Infinity,
@@ -155,8 +205,8 @@ export default function Home({ params }) {
         );
         setResult(
           statuses[parseInt(resp.data.judgement.status_id) - 1] +
-            "\n" +
-            resp.data.decoded?.toString()
+          "\n" +
+          resp.data.decoded?.toString()
         );
       }
     } catch (err) {
@@ -173,38 +223,32 @@ export default function Home({ params }) {
       setAlignment("testcase");
       setResult("Loading....");
       let data = JSON.stringify({
-        code: availableCodes[selectVal],
-        lang_id: langs_ids[selectVal],
-        input: customTestcase,
+        source_code: encodeToBase64(availableCodes[selectVal]),
+        language_id: langs_ids[selectVal],
+        qstnid: parseInt(params.questionId),
       });
 
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `http://${IP}:3001/judge/custom`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
 
-      const resp = await axios.request(config);
-      console.log(resp.data);
 
-      if (parseInt(resp.data.judgement.status_id) <= 4) {
-        setResult(resp.data.stdout);
-        setPassed("success");
-        setTestcaseStatus("Compiled Successfully");
-      } else {
-        setPassed("error");
-        setTestcaseStatus(
-          statuses[parseInt(resp.data.judgement.status_id) - 1]
-        );
-        setResult(
-          statuses[parseInt(resp.data.judgement.status_id) - 1] +
-            "\n" +
-            resp.data.decoded?.toString()
-        );
+
+      const token = Cookies.get("token");
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      try {
+        const response = await api.post("submission/run", data);
+        console.log(response.data);
+        let resultObj = {}
+        response.data[0].submission_result.compile_output ? (resultObj["Compile Error"] = decodeFromBase64(response.data[0].submission_result.compile_output)) : (
+
+          response.data.map((sub, index) => {
+            resultObj[`Case ${index + 1}`] = { "status": sub.submission_result.status.description, "input": sub.input_data, "output": sub.output_data, "your_output": decodeFromBase64(sub.submission_result.stdout) }
+          })
+        )
+        setResult(resultObj)
+        setAlignment("result")
+      } catch (error) {
+        console.error("Error fetching closed groups:", error);
+      } finally {
+        // setLoading(false);
       }
     } catch (err) {
       setResult(err.response.data.message);
@@ -217,42 +261,35 @@ export default function Home({ params }) {
   const handleSubmit = async () => {
     try {
       setButtonStatus(true);
-      setAlignment("result");
+      setAlignment("testcase");
       setResult("Loading....");
       let data = JSON.stringify({
-        code: availableCodes[selectVal],
-        lang_id: langs_ids[selectVal],
+        source_code: encodeToBase64(availableCodes[selectVal]),
+        language_id: langs_ids[selectVal],
+        qstnid: parseInt(params.questionId),
+        "userid": parseInt(user.payload.id),
+        "testId": parseInt(params.id)
       });
 
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `/api/submit`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      const resp = await axios.request(config);
-      console.log(resp.data);
-
-      if (resp.data.judgement.status_id == "3") {
-        setResult("All Hidden Testcases Passed!!!");
-        setPassed("success");
-        setTestcaseStatus("Passed");
-      } else {
-        setPassed("error");
-        setTestcaseStatus("Failed");
-        setResult(
-          statuses[parseInt(resp.data.judgement.status_id) - 1] +
-            "\n" +
-            resp.data.decoded?.toString()
-        );
+      const token = Cookies.get("token");
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      try {
+        const response = await api.post("submission/submit", data);
+        console.log(response.data);
+        setResult(response?.data?.finalStatus)
+        setAlignment("submit")
+        console.log(alignment);
+        setTestcaseStatus(response?.data?.finalStatus == "Accepted" ? "Passed" : "Failed")
+        setPassed(response?.data?.finalStatus == "Accepted" ? "success" : "error")
+      } catch (error) {
+        console.error("Error fetching closed groups:", error);
+      } finally {
+        // setLoading(false);
       }
     } catch (err) {
       setResult(err.response.data.message);
     } finally {
+      // setAlignment("result");
       setButtonStatus(false);
     }
   };
@@ -276,8 +313,7 @@ export default function Home({ params }) {
     };
 
     fetch(
-      `http://${IP}:3001/submit-file?name=${
-        name + "_" + roll
+      `http://${IP}:3001/submit-file?name=${name + "_" + roll
       }&extention=${extention}`,
       requestOptions
     )
@@ -420,7 +456,7 @@ export default function Home({ params }) {
                 }}
                 // value={age}
                 label="Language"
-                // onChange={handleChange}
+              // onChange={handleChange}
               >
                 <MenuItem value={0}>C</MenuItem>
                 <MenuItem value={1}>CPP</MenuItem>
@@ -434,7 +470,7 @@ export default function Home({ params }) {
               sx={{ ml: "auto", alignSelf: "flex-end" }}
               variant="contained"
               color="secondary"
-              onClick={handleCheck}
+              onClick={handleRun}
             >
               Run
             </Button>
@@ -523,128 +559,36 @@ export default function Home({ params }) {
                   style={{ minWidth: "100%" }}
                 ></AceEditor>
               ) : alignment == "result" ? (
-                <AceEditor
-                  value={result}
-                  minRows="15"
-                  height="100%"
-                  readOnly={true}
-                  style={{ minWidth: "100%" }}
-                ></AceEditor>
+                // <AceEditor
+                //   value={result}
+                //   minRows="15"
+                //   height="100%"
+                //   readOnly={true}
+                //   style={{ minWidth: "100%" }}
+                // ></AceEditor>
+                <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
+                  {Object.keys(result).map((key, index) => (
+                    <TestCaseCard testCase={result[key]} index={index} key={index} />
+                  ))}
+                </Box>
               ) : (
                 <Box
                   display={"flex"}
-                  flexDirection={"column"}
-                  justifyContent={"space-center"}
-                  marginTop={1}
-                  minHeight={"100%"}
-                  width={"80%"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  sx={{ marginTop: 1, minHeight: "100%", width: "80%" }}
                 >
-                  {/* <TextField   label="Name" variant="outlined" fullWidth="false" sx={{
-                  width:"30%",
-                  mb:1
-                  // alignSelf:"center"
-                }} />
-                <TextField   label="Password" variant="outlined" fullWidth="false" sx={{
-                  width:"30%",
-                  
-                  // alignSelf:"center"
-                }} />
-                <TextField    label="Roll Number" variant="outlined" fullWidth="false" sx={{
-                  width:"30%",
-                  alignSelf:""
-                  
-                  // alignSelf:"center"
-                }} /> */}
-                  <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                      <TextField
-                        label="Name"
-                        value={formName}
-                        onChange={(e) => {
-                          setFormName(e.target.value);
-                        }}
-                        variant="outlined"
-                      >
-                        xs=8
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <TextField
-                        label="Roll Number"
-                        value={rollNum}
-                        onChange={(e) => {
-                          setRollNum(e.target.value);
-                        }}
-                        variant="outlined"
-                      >
-                        xs=4
-                      </TextField>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={4}
-                      justifyContent={"center"}
-                      textAlign={"center"}
-                      padding={1}
-                      display={"flex"}
-                      flexDirection={"row"}
-                      alignItems={"center"}
-                      sx={{
-                        textAlign: "center",
-                        justifyContent: "space-around ",
-                      }}
-                    >
-                      {testcaseStatus != "Passed" ? (
-                        <WarningIcon color="error" sx={{ mt: 1 }}></WarningIcon>
-                      ) : (
-                        <CheckCircleIcon
-                          color="success"
-                          sx={{ mt: 1 }}
-                        ></CheckCircleIcon>
-                      )}{" "}
-                      <TextField
-                        value={
-                          testcaseStatus != "Passed"
-                            ? "Testcases not Passed"
-                            : "Testcases Passed"
-                        }
-                        disabled
-                        variant="standard"
-                      >
-                        Hidden Testcases not Passed
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <TextField
-                        label="Password"
-                        value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                        }}
-                        variant="outlined"
-                      >
-                        xs=4
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <LoadingButton
-                        size="large"
-                        onClick={handleFileSend}
-                        endIcon={<SendIcon />}
-                        loading={loading}
-                        loadingPosition="end"
-                        variant="contained"
-                        sx={{
-                          mt: 1,
-                          ml: 3,
-                          mr: 2,
-                          mb: 1,
-                        }}
-                      >
-                        <span>Send</span>
-                      </LoadingButton>
-                    </Grid>
-                  </Grid>
+                  {testcaseStatus !== "Passed" ? (
+                    <WarningIcon color="error" sx={{ mr: 1 }} />
+                  ) : (
+                    <CheckCircleIcon color="success" sx={{ mr: 1 }} />
+                  )}
+                  <TextField
+                    value={testcaseStatus !== "Passed" ? "Testcases not Passed" : "Testcases Passed"}
+                    disabled
+                    variant="standard"
+                    sx={{ width: "100%" }}
+                  />
                 </Box>
               )}
             </Box>

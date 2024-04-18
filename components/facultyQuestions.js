@@ -21,7 +21,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { decodeFromBase64 } from "@/utils";
 import EditQuestionModal from "@/components/editQuestionModal";
-import AddQuestionModal from "./addQuestionModal";
+import AddTestCaseModal from "@/components/addTestCaseModal";
+
 
 // // AddClosedGroupModal
 
@@ -30,15 +31,21 @@ export default function QuestionsTable(props) {
   const [loading, setLoading] = useState(true);
 
   const [editQuestionOpen, setEditQuestionOpen] = useState(false);
+  const [addTestCaseOpen, setAddTestCaseOpen] = useState(false);
   const [currentdata, setCurrentdata] = useState({});
   //   const theme = useTheme();
-  // console.log(props)
+  console.log("props", props)
   const handleEditQuestionOpen = (params) => {
     setEditQuestionOpen(true);
     setCurrentdata(params.row);
   };
+  const handleAddTestCaseOpen = (params) => {
+    setAddTestCaseOpen(true);
+    setCurrentdata(params.row);
+  };
 
   const handleEditQuestionClose = () => setEditQuestionOpen(false);
+  const handleAddTestCaseClose = () => setAddTestCaseOpen(false);
   const theme = useTheme();
   const { questions, toggleRefresh } = props;
   console.log("QUESTIONS: ", questions);
@@ -72,6 +79,28 @@ export default function QuestionsTable(props) {
     },
     { field: "hiddenCount", headerName: "Hidden TestCases" },
     { field: "totalcases", headerName: "Total TestCases" },
+    {
+      field: "createdAt",
+      headerName: "Actions",
+      type: "number",
+      width: 200,
+      renderCell: (params) => {
+        // { console.log("params", params.row) }
+        return (
+          //   <Link target="_blank" href={"/closed-groups/" + params.row.id}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              handleAddTestCaseOpen(params);
+            }}
+          >
+            Add TestCase
+          </Button>
+          //   </Link>
+        );
+      },
+    },
     // {
     //   renderCell: (params) => {
     //     return (
@@ -87,7 +116,7 @@ export default function QuestionsTable(props) {
     // },
   ];
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   return (
     <>
@@ -125,7 +154,22 @@ export default function QuestionsTable(props) {
             setEditQuestionOpen={setEditQuestionOpen}
             currentdata={currentdata}
             toggleRefresh={toggleRefresh}
-            // refresh={toggleRefresh}
+          // refresh={toggleRefresh}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={addTestCaseOpen}
+        onClose={handleAddTestCaseClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box>
+          <AddTestCaseModal
+            setAddTestCaseOpen={setAddTestCaseOpen}
+            currentdata={currentdata}
+            toggleRefresh={toggleRefresh}
+          // refresh={toggleRefresh}
           />
         </Box>
       </Modal>

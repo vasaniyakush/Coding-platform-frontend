@@ -19,19 +19,20 @@ import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-github";
 import api from "@/api";
 
-function LeftPanel(data) {
+function LeftPanel({ data, toggleRefresh }) {
   // console.log(data, data?.statement)
   const [htmlCode, setHtmlCode] = React.useState(
-    decodeFromBase64(data?.data?.statement)
+    decodeFromBase64(data?.statement)
   );
 
   const handleSave = async () => {
     try {
       const encodedHtmlCode = encodeToBase64(htmlCode);
-      await api.put(`/question/${data?.data?.id}`, {
-        testId: data.data?.testId,
+      await api.put(`/question/${data?.id}`, {
+        testId: data?.testId,
         statement: encodedHtmlCode,
       });
+      toggleRefresh();
       console.log("Question data updated successfully!");
     } catch (error) {
       console.error("Error updating question data:", error);
@@ -60,6 +61,7 @@ function LeftPanel(data) {
         theme="github"
         width="100%"
         height="80vh"
+        fontSize={18}
         value={htmlCode}
         onChange={(newValue) => setHtmlCode(newValue)}
       />
@@ -254,7 +256,8 @@ export default function AddClosedGroupModal(props) {
           </Typography>
           <Divider />
           <Grid container spacing={0}>
-            <LeftPanel data={currentdata} />
+            <LeftPanel
+              toggleRefresh={toggleRefresh} data={currentdata} />
             <RightPanel
               toggleRefresh={toggleRefresh}
               data={currentdata?.TestCase}

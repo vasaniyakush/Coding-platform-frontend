@@ -20,6 +20,7 @@ import api from "@/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import AddTestModal from "@/components/addTestModal";
 // import AddClosedGroupModal from "@/components/CreateGroupModal";
 // AddClosedGroupModal
 
@@ -170,10 +171,10 @@ export default function Home() {
         aria-describedby="modal-modal-description"
       >
         <Box>
-          {/* <AddClosedGroupModal
-            setAddUserOpen={setAddUserOpen}
-            refresh={toggleRefresh}
-          /> */}
+          <AddTestModal
+            setAddQuestionOpen={setAddUserOpen}
+            toggleRefresh={toggleRefresh}
+          />
         </Box>
       </Modal>
     </>
