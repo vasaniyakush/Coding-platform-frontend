@@ -1,16 +1,21 @@
 "use client";
 import { decodeFromBase64, encodeToBase64, getIPv4Addresses } from "@/utils";
 import {
+  AppBar,
   Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
   Grid,
+  Toolbar,
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Link from "next/link";
+import CachedIcon from "@mui/icons-material/Cached";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Home({ openTab }) {
   const networkInterfaces = getIPv4Addresses();
@@ -33,7 +38,14 @@ export default function Home({ openTab }) {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={6} md={6} lg={6}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Typography variant="h6" noWrap component="div">
+            SKIT College Online Examination Platform
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Grid mt={"4rem"} item xs={6} md={6} lg={6}>
         <Card>
           <CardMedia
             sx={{ height: "50vh" }}
@@ -59,7 +71,7 @@ export default function Home({ openTab }) {
         </Card>
       </Grid>
 
-      <Grid item xs={6} md={6} lg={6}>
+      <Grid mt={"4rem"} item xs={6} md={6} lg={6}>
         <Card>
           <CardMedia
             sx={{ height: "50vh" }}

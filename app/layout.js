@@ -63,7 +63,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <title>Admin</title>
-        <link rel="icon" href="/images/AppIcon.png" type="image/x-icon" />
+        <link rel="icon" href="/public/skit_logo.png" type="image/x-icon" />
       </head>
       <body>
         <ThemeProvider theme={{ [THEME_ID]: materialTheme }}>
