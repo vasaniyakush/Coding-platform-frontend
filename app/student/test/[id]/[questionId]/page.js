@@ -275,10 +275,10 @@ export default function Home({ params }) {
       api.defaults.headers.Authorization = `Bearer ${token}`;
       try {
         const response = await api.post("submission/submit", data);
-        console.log(response.data);
+        console.log("res", response.data);
         setResult(response?.data?.finalStatus)
         setAlignment("submit")
-        console.log(alignment);
+        console.log("allginment", alignment);
         setTestcaseStatus(response?.data?.finalStatus == "Accepted" ? "Passed" : "Failed")
         setPassed(response?.data?.finalStatus == "Accepted" ? "success" : "error")
       } catch (error) {
@@ -488,6 +488,7 @@ export default function Home({ params }) {
           <Box
             sx={{ bgcolor: "#cfe8fc", width: "100%", height: "100%", ml: 1 }}
           >
+
             {/* {console.log(cppCode) } */}
             <AceEditor
               onChange={(value) => {
