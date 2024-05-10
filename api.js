@@ -12,8 +12,6 @@ import Axios from "axios";
 // };
 let urls = {
   test: `http://localhost:3000`,
-  // development: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
-  // production: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
   development: "http://127.0.0.1:8080/",
   production: "http://127.0.0.1:8080/",
 };
