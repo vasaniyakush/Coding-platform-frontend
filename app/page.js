@@ -2,6 +2,7 @@
 import { decodeFromBase64, encodeToBase64, getIPv4Addresses } from "@/utils";
 import {
   AppBar,
+  Box,
   Button,
   Card,
   CardActions,
@@ -12,17 +13,36 @@ import {
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import skit_logo from "@/public/skit_logo.png";
+
 import Link from "next/link";
 import CachedIcon from "@mui/icons-material/Cached";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { use, useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Home({ openTab }) {
-  const networkInterfaces = getIPv4Addresses();
+  const [networkInterfaces, setNetworkInterfaces] = useState({});
+  // const networkInterfaces = getIPv4Addresses();
   console.log("networkInterfaces: ", networkInterfaces);
-  const arr = Object.keys(networkInterfaces).map((address) => {
-    return `http://${networkInterfaces[address][0]}:3000/ `;
-  });
+
+  const [arr, setArr] = useState([]);
+  useEffect(() => {
+    setArr(
+      Object.keys(networkInterfaces).map((address) => {
+        return `http://${networkInterfaces[address][0]}:3000/ `;
+      })
+    );
+  }, [networkInterfaces]);
+  useEffect(() => {
+    setNetworkInterfaces(getIPv4Addresses());
+  }, []);
+  // setArr(
+  //   Object.keys(networkInterfaces).map((address) => {
+  //     return `http://${networkInterfaces[address][0]}:3000/ `;
+  //   })
+  // );
   const requestFullScreen = () => {
     const element = document.documentElement;
     if (element.requestFullscreen) {
@@ -43,6 +63,15 @@ export default function Home({ openTab }) {
           <Typography variant="h6" noWrap component="div">
             SKIT College Online Examination Platform
           </Typography>
+          <Box sx={{ flexGrow: 1, mr: 10 }} />
+          {/* </Box> */}
+          <Image
+            src={skit_logo}
+            width={50}
+            height={50}
+            alt="green iguana"
+            style={{ left: "0" }}
+          />
         </Toolbar>
       </AppBar>
       <Grid mt={"4rem"} item xs={6} md={6} lg={6}>
@@ -96,26 +125,29 @@ export default function Home({ openTab }) {
           </CardActions>
         </Card>
       </Grid>
-      {/* <Grid item xs={6} md={6} lg={6}>
-        <Card>
-          <CardContent>
-            {arr.map((address) => (
-              <Link key={address} href={address}>
+      {arr.length > 0 && (
+        <Grid item xs={6} md={6} lg={6}>
+          <Card>
+            <CardContent>
+              {arr.map((address) => (
+                // <Link key={address} href={address}>
                 <Typography
+                  key={address}
                   sx={{
                     textDecoration: "underline",
                   }}
                   gutterBottom
-                  variant="h5"
-                  component="div"
+                  // variant="h5"
+                  // component="a"
                 >
-                  <em>{address}</em>
+                  {address}
                 </Typography>
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
-      </Grid> */}
+                // </Link>
+              ))}
+            </CardContent>
+          </Card>
+        </Grid>
+      )}
     </Grid>
   );
 }

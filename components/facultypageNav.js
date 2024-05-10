@@ -161,6 +161,15 @@ export default function PageNav({ children }) {
           <Typography variant="h6" noWrap component="div">
             Faculty Panel
           </Typography>
+          <Box sx={{ flexGrow: 1, mr: 10 }} />
+          {/* </Box> */}
+          <Image
+            src={skit_logo}
+            width={50}
+            height={50}
+            alt="green iguana"
+            style={{ left: "0" }}
+          />
         </Toolbar>
       </AppBar>
       {isAuthenticated ? (
@@ -176,13 +185,6 @@ export default function PageNav({ children }) {
                   <>
                     {console.log(skit_logo)}
 
-                    <Image
-                      src={skit_logo}
-                      width={50}
-                      height={50}
-                      alt="green iguana"
-                      style={{ left: "0" }}
-                    />
                     <ChevronLeftIcon />
                   </>
                 )}

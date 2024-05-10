@@ -11,9 +11,9 @@ import Axios from "axios";
 //   production: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
 // };
 let urls = {
-  test: `http://localhost:3000`,
-  development: "http://127.0.0.1:8080/",
-  production: "http://127.0.0.1:8080/",
+  test: `https://7q0xhxzq-8080.inc1.devtunnels.ms/`,
+  development: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
+  production: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
 };
 const api = Axios.create({
   baseURL: urls[process.env.NODE_ENV || "production"],

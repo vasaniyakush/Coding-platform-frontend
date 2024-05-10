@@ -16,7 +16,7 @@ import "ace-builds/src-noconflict/theme-github";
 
 function LeftPanel({ setAddQuestionOpen, toggleRefresh, testId }) {
   const [htmlCode, setHtmlCode] = useState("");
-  console.log(testId)
+  console.log(testId);
   const handleSave = async () => {
     try {
       const encodedHtmlCode = encodeToBase64(htmlCode);
@@ -61,7 +61,11 @@ function LeftPanel({ setAddQuestionOpen, toggleRefresh, testId }) {
   );
 }
 
-export default function AddQuestionModal({ setAddQuestionOpen, toggleRefresh, testId }) {
+export default function AddQuestionModal({
+  setAddQuestionOpen,
+  toggleRefresh,
+  testId,
+}) {
   const [err, setErr] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -76,13 +80,20 @@ export default function AddQuestionModal({ setAddQuestionOpen, toggleRefresh, te
   return (
     <>
       <Container maxWidth="xl" sx={{ mb: 4, maxHeight: "80vh" }}>
-        <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+        <Paper
+          variant="outlined"
+          sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}
+        >
           <Typography component="h1" variant="h4" align="center">
-            ADD Question Data
+            Add Question Data
           </Typography>
           <Divider />
           <Grid container spacing={0}>
-            <LeftPanel setAddQuestionOpen={setAddQuestionOpen} toggleRefresh={toggleRefresh} testId={testId} />
+            <LeftPanel
+              setAddQuestionOpen={setAddQuestionOpen}
+              toggleRefresh={toggleRefresh}
+              testId={testId}
+            />
           </Grid>
           <Button
             variant="contained"

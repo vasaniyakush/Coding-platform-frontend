@@ -167,6 +167,8 @@ export default function PageNav({ children, params }) {
     const confirmed = window.confirm("Are you sure you want to go back?");
     if (confirmed) {
       router.push("/student/");
+      Cookies.remove("token");
+      localStorage.clear();
     }
   };
 
@@ -205,8 +207,10 @@ export default function PageNav({ children, params }) {
                   <Link
                     key={ques.id}
                     href={`/student/test/${params.id}/${ques.id}`}
+                    style={{ marginBottom: "1rem" }}
                   >
                     <ListItem
+                      style={{ cursor: "pointer" }}
                       key={"Tests"}
                       onClick={() => setOpenTab("Tests".toLowerCase())}
                       disablePadding
@@ -227,6 +231,9 @@ export default function PageNav({ children, params }) {
                       </ListItemButton>
                     </ListItem>
                     <Divider></Divider>
+                    {index != questions.length - 1 && (
+                      <Divider sx={{ mt: 3 }}></Divider>
+                    )}
                   </Link>
                 );
               })}

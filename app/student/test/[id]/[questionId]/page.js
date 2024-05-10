@@ -22,6 +22,7 @@ import {
   Divider,
   Drawer,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -30,6 +31,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Switch,
   TextField,
   TextareaAutosize,
   ToggleButton,
@@ -66,9 +68,19 @@ import { useStudentAuth } from "@/contexts/student-auth";
 // import { BorderColor } from "@mui/icons-material";
 
 const TestCaseCard = ({ testCase, index }) => {
-  console.log(testCase, index)
+  console.log(testCase, index);
   return (
-    <Card variant="outlined" key={index} sx={{ mb: 2 }}>
+    <Card
+      style={{
+        ...(testCase?.status != "Accepted" && {
+          backgroundColor: "#c62828",
+          color: "white",
+        }),
+      }}
+      variant="elevation"
+      key={index}
+      sx={{ mb: 2 }}
+    >
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Case {index + 1}
@@ -91,10 +103,52 @@ const TestCaseCard = ({ testCase, index }) => {
     </Card>
   );
 };
-
+const CustomTestCaseCard = ({ testCase, index }) => {
+  console.log(testCase, index);
+  return (
+    <Card
+      style={{
+        ...(testCase?.status != "Accepted" && {
+          backgroundColor: "#c62828",
+          color: "white",
+        }),
+      }}
+      variant="elevation"
+      key={index}
+      sx={{ mb: 2 }}
+    >
+      <CardContent>
+        <Typography variant="body2" mt={2}>
+          Input:
+          <AceEditor
+            value={testCase && testCase?.input}
+            // minRows=""
+            height="100%"
+            readOnly={true}
+            minLines={1}
+            style={{ minWidth: "100%" }}
+          ></AceEditor>
+        </Typography>
+        <Divider />
+        <Typography variant="body2" mt={2}>
+          {/* Your Output: {testCase.your_output && decodeFromBase64(testCase.your_output)} */}
+          Your Output:
+          <AceEditor
+            value={testCase.your_output && testCase?.your_output}
+            // minRows=""
+            height="100%"
+            readOnly={true}
+            minLines={1}
+            style={{ minWidth: "100%" }}
+          ></AceEditor>
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function Home({ params }) {
-  const { user } = useStudentAuth()
+  const { user } = useStudentAuth();
   console.log("heyy usr", user);
   const [lang, setLang] = useState(langs[0]);
   const [selectVal, setSelectVal] = useState(1);
@@ -122,6 +176,15 @@ export default function Home({ params }) {
     `CODE_${params.id}_${params.questionId}`,
     cppCode
   );
+
+  const [customFlag, setCustomFlag] = useState(false);
+  const handleFlagChange = () => {
+    setAlignment("testcase");
+    setResult("UnVuIG9yIFN1Ym1pdCB0byBzZWUgb3V0cHV0DQo=");
+    setCustomFlag(!customFlag);
+    // if (customFlag) {
+    // }
+  };
   const availableCodes = [cCode, cppCode, javaCode, pyCode];
   const availableSetCodes = [setCCode, setCPPCode, setJavaCode, setPyCode];
   const [fontSize, setFontSize] = useLocalStorage("fontsize", 20);
@@ -137,7 +200,7 @@ export default function Home({ params }) {
   );
   const [result, setResult] = useLocalStorage(
     `result_${params.id}_${params.questionId}`,
-    "Run or Submit to see output"
+    "UnVuIG9yIFN1Ym1pdCB0byBzZWUgb3V0cHV0DQo="
   );
   const [passed, setPassed] = useState("default");
   const [testcaseStatus, setTestcaseStatus] = useState("status");
@@ -152,7 +215,7 @@ export default function Home({ params }) {
   const handleChange = (event, newAlignment) => {
     setAlignment(newAlignment);
   };
-
+  /*
   const handleCheck = async () => {
     try {
       setButtonStatus(true);
@@ -169,15 +232,21 @@ export default function Home({ params }) {
       try {
         const response = await api.post("submission/run");
         console.log(response.data);
-        let resultObj = {}
-        response.data[0].submission_result.compile_output ? (resultObj["Compile Error"] = decodeFromBase64(response.data[0].submission_result.compile_output)) : (
-
-          response.data.map((sub, index) => {
-            resultObj[`Case ${index + 1}`] = { "status": sub.submission_result.status.description, "input": sub.input_data, "output": sub.output_data, "your_output": decodeFromBase64(sub.submission_result.stdout) }
-          })
-        )
-        setResult(JSON.stringify(resultObj))
-        setAlignment()
+        let resultObj = {};
+        response.data[0].submission_result.compile_output
+          ? (resultObj["Compile Error"] = decodeFromBase64(
+              response.data[0].submission_result.compile_output
+            ))
+          : response.data.map((sub, index) => {
+              resultObj[`Case ${index + 1}`] = {
+                status: sub.submission_result.status.description,
+                input: sub.input_data,
+                output: sub.output_data,
+                your_output: decodeFromBase64(sub.submission_result.stdout),
+              };
+            });
+        setResult(JSON.stringify(resultObj));
+        setAlignment();
       } catch (error) {
         console.error("Error fetching closed groups:", error);
       } finally {
@@ -208,8 +277,8 @@ export default function Home({ params }) {
         );
         setResult(
           statuses[parseInt(resp.data.judgement.status_id) - 1] +
-          "\n" +
-          resp.data.decoded?.toString()
+            "\n" +
+            resp.data.decoded?.toString()
         );
       }
     } catch (err) {
@@ -220,44 +289,91 @@ export default function Home({ params }) {
       setButtonStatus(false);
     }
   };
+*/
   const handleRun = async () => {
-    try {
-      setButtonStatus(true);
-      setAlignment("testcase");
-      setResult("Loading....");
-      let data = JSON.stringify({
-        source_code: encodeToBase64(availableCodes[selectVal]),
-        language_id: langs_ids[selectVal],
-        qstnid: parseInt(params.questionId),
-      });
-
-
-
-
-      const token = Cookies.get("token");
-      api.defaults.headers.Authorization = `Bearer ${token}`;
+    if (!customFlag) {
       try {
-        const response = await api.post("submission/run", data);
-        console.log(response.data);
-        let resultObj = {}
-        response.data[0].submission_result.compile_output ? (resultObj["Compile Error"] = decodeFromBase64(response.data[0].submission_result.compile_output)) : (
+        setLoading(true);
+        setButtonStatus(true);
+        setAlignment("testcase");
+        setResult("Loading....");
+        let data = JSON.stringify({
+          source_code: encodeToBase64(availableCodes[selectVal]),
+          language_id: langs_ids[selectVal],
+          qstnid: parseInt(params.questionId),
+        });
 
-          response.data.map((sub, index) => {
-            resultObj[`Case ${index + 1}`] = { "status": sub.submission_result.status.description, "input": sub.input_data, "output": sub.output_data, "your_output": decodeFromBase64(sub.submission_result.stdout) }
-          })
-        )
-        setResult(resultObj)
-        setAlignment("result")
-      } catch (error) {
-        console.error("Error fetching closed groups:", error);
+        const token = Cookies.get("token");
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        try {
+          const response = await api.post("submission/run", data);
+          console.log(response.data);
+          let resultObj = {};
+          response.data[0].submission_result.compile_output
+            ? (resultObj = response.data[0].submission_result.compile_output)
+            : response.data.map((sub, index) => {
+                resultObj[`Case ${index + 1}`] = {
+                  status: sub.submission_result.status.description,
+                  input: sub.input_data,
+                  output: sub.output_data,
+                  your_output: decodeFromBase64(sub.submission_result.stdout),
+                };
+              });
+          setResult(resultObj);
+          setAlignment("result");
+        } catch (error) {
+          console.error("Error fetching closed groups:", error);
+        } finally {
+          setLoading(false);
+        }
+      } catch (err) {
+        setResult(err.response.data.message);
       } finally {
-        // setLoading(false);
+        setAlignment("result");
+        setButtonStatus(false);
       }
-    } catch (err) {
-      setResult(err.response.data.message);
-    } finally {
-      setAlignment("result");
-      setButtonStatus(false);
+    } else {
+      try {
+        setLoading(true);
+        setButtonStatus(true);
+        setAlignment("testcase");
+        setResult("Loading....");
+        let data = JSON.stringify({
+          source_code: encodeToBase64(availableCodes[selectVal]),
+          language_id: langs_ids[selectVal],
+          stdin: encodeToBase64(customTestcase),
+        });
+
+        const token = Cookies.get("token");
+        api.defaults.headers.Authorization = `Bearer ${token}`;
+        try {
+          const response = await api.post("submission/custom", data);
+          console.log(response.data);
+          let resultObj = {};
+          response.data.submission_result.data.compile_output
+            ? (resultObj = response.data.submission_result.data.compile_output)
+            : (resultObj = {
+                status: response.data.submission_result.data.status.description,
+                input: decodeFromBase64(response.data.submission_result.input),
+                // output: response.data.output_data,
+                your_output: decodeFromBase64(
+                  response.data.submission_result.data.stdout
+                ),
+              });
+
+          setResult(resultObj);
+          setAlignment("result");
+        } catch (error) {
+          console.error("Error fetching closed groups:", error);
+        } finally {
+          setLoading(false);
+        }
+      } catch (err) {
+        setResult(err.response.data.message);
+      } finally {
+        setAlignment("result");
+        setButtonStatus(false);
+      }
     }
   };
 
@@ -270,9 +386,9 @@ export default function Home({ params }) {
         source_code: encodeToBase64(availableCodes[selectVal]),
         language_id: langs_ids[selectVal],
         qstnid: parseInt(params.questionId),
-        "userid": parseInt(user.payload.userId),
+        userid: parseInt(user.payload.userId),
         // "userid": parseInt(user.payload.id),
-        "testId": parseInt(params.id)
+        testId: parseInt(params.id),
       });
 
       const token = Cookies.get("token");
@@ -280,11 +396,15 @@ export default function Home({ params }) {
       try {
         const response = await api.post("submission/submit", data);
         console.log("res", response.data);
-        setResult(response?.data?.finalStatus)
-        setAlignment("submit")
+        setResult(response?.data?.finalStatus);
+        setAlignment("submit");
         console.log("allginment", alignment);
-        setTestcaseStatus(response?.data?.finalStatus == "Accepted" ? "Passed" : "Failed")
-        setPassed(response?.data?.finalStatus == "Accepted" ? "success" : "error")
+        setTestcaseStatus(
+          response?.data?.finalStatus == "Accepted" ? "Passed" : "Failed"
+        );
+        setPassed(
+          response?.data?.finalStatus == "Accepted" ? "success" : "error"
+        );
       } catch (error) {
         console.error("Error fetching closed groups:", error);
       } finally {
@@ -317,7 +437,8 @@ export default function Home({ params }) {
     };
 
     fetch(
-      `http://${IP}:3001/submit-file?name=${name + "_" + roll
+      `http://${IP}:3001/submit-file?name=${
+        name + "_" + roll
       }&extention=${extention}`,
       requestOptions
     )
@@ -460,7 +581,7 @@ export default function Home({ params }) {
                 }}
                 // value={age}
                 label="Language"
-              // onChange={handleChange}
+                // onChange={handleChange}
               >
                 <MenuItem value={0}>C</MenuItem>
                 <MenuItem value={1}>CPP</MenuItem>
@@ -468,31 +589,42 @@ export default function Home({ params }) {
                 <MenuItem value={3}>Python</MenuItem>
               </Select>
             </FormControl>
+
             <Button
               size="small"
               disabled={buttonStatus}
               sx={{ ml: "auto", alignSelf: "flex-end" }}
-              variant="contained"
-              color="secondary"
-              onClick={handleRun}
-            >
-              Run
-            </Button>
-            <Button
-              size="small"
-              disabled={buttonStatus}
-              sx={{ ml: 1, alignSelf: "flex-end" }}
               variant="contained"
               color="primary"
               onClick={handleSubmit}
             >
               Submit
             </Button>
+            <Button
+              size="small"
+              disabled={buttonStatus}
+              sx={{ ml: 1, alignSelf: "flex-end" }}
+              variant="contained"
+              color="secondary"
+              onClick={handleRun}
+            >
+              Run {customFlag ? "Custom" : "Sample"}
+            </Button>
+            <FormControlLabel
+              sx={{ ml: 1, alignSelf: "flex-end" }}
+              control={
+                <Switch
+                  checked={customFlag}
+                  onClick={handleFlagChange}
+                  defaultChecked
+                />
+              }
+              label="Custom Testcase"
+            />
           </Container>
           <Box
             sx={{ bgcolor: "#cfe8fc", width: "100%", height: "100%", ml: 1 }}
           >
-
             {/* {console.log(cppCode) } */}
             <AceEditor
               onChange={(value) => {
@@ -571,11 +703,32 @@ export default function Home({ params }) {
                 //   readOnly={true}
                 //   style={{ minWidth: "100%" }}
                 // ></AceEditor>
-                <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
-                  {Object.keys(result).map((key, index) => (
-                    <TestCaseCard testCase={result[key]} index={index} key={index} />
-                  ))}
-                </Box>
+                typeof result === "string" ? (
+                  <AceEditor
+                    value={decodeFromBase64(result)}
+                    minRows="15"
+                    height="100%"
+                    readOnly={true}
+                    style={{ minWidth: "100%" }}
+                  ></AceEditor>
+                ) : // <Typography>{decodeFromBase64(result)}</Typography> // Render the string value directly
+                !customFlag ? (
+                  <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
+                    {Object.keys(result)?.map((key, index) => (
+                      <TestCaseCard
+                        testCase={result[key]}
+                        index={index}
+                        key={index}
+                      />
+                    ))}
+                  </Box>
+                ) : (
+                  <>
+                    <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
+                      <CustomTestCaseCard testCase={result} index={1} key={1} />
+                    </Box>
+                  </>
+                )
               ) : (
                 <Box
                   display={"flex"}
@@ -586,7 +739,8 @@ export default function Home({ params }) {
                     minHeight: "100%",
                     width: "100%",
                     borderRadius: 0,
-                    backgroundColor: testcaseStatus !== "Passed" ? "#FFCDD2" : "#C8E6C9",
+                    backgroundColor:
+                      testcaseStatus !== "Passed" ? "#FFCDD2" : "#C8E6C9",
                     padding: 2,
                     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                   }}
@@ -601,10 +755,11 @@ export default function Home({ params }) {
                     color={testcaseStatus !== "Passed" ? "error" : "success"}
                     fontWeight="bold"
                   >
-                    {testcaseStatus !== "Passed" ? "Testcases Failed" : "Testcases Passed"}
+                    {testcaseStatus !== "Passed"
+                      ? "Testcases Failed"
+                      : "Testcases Passed"}
                   </Typography>
                 </Box>
-
               )}
             </Box>
           </Box>
