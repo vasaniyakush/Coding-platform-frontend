@@ -312,13 +312,13 @@ export default function Home({ params }) {
           response.data[0].submission_result.compile_output
             ? (resultObj = response.data[0].submission_result.compile_output)
             : response.data.map((sub, index) => {
-                resultObj[`Case ${index + 1}`] = {
-                  status: sub.submission_result.status.description,
-                  input: sub.input_data,
-                  output: sub.output_data,
-                  your_output: decodeFromBase64(sub.submission_result.stdout),
-                };
-              });
+              resultObj[`Case ${index + 1}`] = {
+                status: sub.submission_result.status.description,
+                input: sub.input_data,
+                output: sub.output_data,
+                your_output: decodeFromBase64(sub.submission_result.stdout),
+              };
+            });
           setResult(resultObj);
           setAlignment("result");
         } catch (error) {
@@ -353,13 +353,13 @@ export default function Home({ params }) {
           response.data.submission_result.data.compile_output
             ? (resultObj = response.data.submission_result.data.compile_output)
             : (resultObj = {
-                status: response.data.submission_result.data.status.description,
-                input: decodeFromBase64(response.data.submission_result.input),
-                // output: response.data.output_data,
-                your_output: decodeFromBase64(
-                  response.data.submission_result.data.stdout
-                ),
-              });
+              status: response.data.submission_result.data.status.description,
+              input: decodeFromBase64(response.data.submission_result.input),
+              // output: response.data.output_data,
+              your_output: decodeFromBase64(
+                response.data.submission_result.data.stdout
+              ),
+            });
 
           setResult(resultObj);
           setAlignment("result");
@@ -386,8 +386,8 @@ export default function Home({ params }) {
         source_code: encodeToBase64(availableCodes[selectVal]),
         language_id: langs_ids[selectVal],
         qstnid: parseInt(params.questionId),
-        userid: parseInt(user.payload.userId),
-        // "userid": parseInt(user.payload.id),
+        // userid: parseInt(user.payload.userId),
+        "userid": parseInt(user.payload.id),
         testId: parseInt(params.id),
       });
 
@@ -437,8 +437,7 @@ export default function Home({ params }) {
     };
 
     fetch(
-      `http://${IP}:3001/submit-file?name=${
-        name + "_" + roll
+      `http://${IP}:3001/submit-file?name=${name + "_" + roll
       }&extention=${extention}`,
       requestOptions
     )
@@ -581,7 +580,7 @@ export default function Home({ params }) {
                 }}
                 // value={age}
                 label="Language"
-                // onChange={handleChange}
+              // onChange={handleChange}
               >
                 <MenuItem value={0}>C</MenuItem>
                 <MenuItem value={1}>CPP</MenuItem>
@@ -712,23 +711,23 @@ export default function Home({ params }) {
                     style={{ minWidth: "100%" }}
                   ></AceEditor>
                 ) : // <Typography>{decodeFromBase64(result)}</Typography> // Render the string value directly
-                !customFlag ? (
-                  <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
-                    {Object.keys(result)?.map((key, index) => (
-                      <TestCaseCard
-                        testCase={result[key]}
-                        index={index}
-                        key={index}
-                      />
-                    ))}
-                  </Box>
-                ) : (
-                  <>
+                  !customFlag ? (
                     <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
-                      <CustomTestCaseCard testCase={result} index={1} key={1} />
+                      {Object.keys(result)?.map((key, index) => (
+                        <TestCaseCard
+                          testCase={result[key]}
+                          index={index}
+                          key={index}
+                        />
+                      ))}
                     </Box>
-                  </>
-                )
+                  ) : (
+                    <>
+                      <Box sx={{ maxHeight: "30vh", overflowY: "scroll" }}>
+                        <CustomTestCaseCard testCase={result} index={1} key={1} />
+                      </Box>
+                    </>
+                  )
               ) : (
                 <Box
                   display={"flex"}
