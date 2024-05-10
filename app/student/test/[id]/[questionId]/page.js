@@ -106,44 +106,29 @@ const TestCaseCard = ({ testCase, index }) => {
 const CustomTestCaseCard = ({ testCase, index }) => {
   console.log(testCase, index);
   return (
-    <Card
-      style={{
-        ...(testCase?.status != "Accepted" && {
-          backgroundColor: "#c62828",
-          color: "white",
-        }),
-      }}
-      variant="elevation"
-      key={index}
-      sx={{ mb: 2 }}
-    >
-      <CardContent>
-        <Typography variant="body2" mt={2}>
-          Input:
-          <AceEditor
-            value={testCase && testCase?.input}
-            // minRows=""
-            height="100%"
-            readOnly={true}
-            minLines={1}
-            style={{ minWidth: "100%" }}
-          ></AceEditor>
-        </Typography>
-        <Divider />
-        <Typography variant="body2" mt={2}>
-          {/* Your Output: {testCase.your_output && decodeFromBase64(testCase.your_output)} */}
-          Your Output:
-          <AceEditor
-            value={testCase.your_output && testCase?.your_output}
-            // minRows=""
-            height="100%"
-            readOnly={true}
-            minLines={1}
-            style={{ minWidth: "100%" }}
-          ></AceEditor>
-        </Typography>
-      </CardContent>
-    </Card>
+    <>
+      <Card
+        style={{
+          ...(testCase?.status != "Accepted" && {
+            backgroundColor: "#c62828",
+            color: "white",
+          }),
+        }}
+        variant="elevation"
+        key={index}
+        sx={{ mb: 2 }}
+      >
+        <CardContent>
+          <Typography variant="body2" mt={2}>
+            Input:{testCase && testCase?.input}
+          </Typography>
+          <Divider />
+          <Typography variant="body2" mt={2}>
+            Your Output:{testCase.your_output && testCase?.your_output}
+          </Typography>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
