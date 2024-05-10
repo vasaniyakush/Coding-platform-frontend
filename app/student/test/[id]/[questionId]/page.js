@@ -66,6 +66,7 @@ import { useStudentAuth } from "@/contexts/student-auth";
 // import { BorderColor } from "@mui/icons-material";
 
 const TestCaseCard = ({ testCase, index }) => {
+  console.log(testCase, index)
   return (
     <Card variant="outlined" key={index} sx={{ mb: 2 }}>
       <CardContent>
@@ -73,18 +74,18 @@ const TestCaseCard = ({ testCase, index }) => {
           Case {index + 1}
         </Typography>
         <Typography variant="body1" gutterBottom>
-          Status: {testCase.status}
+          Status: {testCase && testCase?.status}
         </Typography>
         <Divider />
         <Typography variant="body2" mt={2}>
-          Input: {decodeFromBase64(testCase.input)}
+          Input: {decodeFromBase64(testCase && testCase?.input)}
         </Typography>
         <Typography variant="body2" mt={2}>
-          Expected Output: {decodeFromBase64(testCase.output)}
+          Expected Output: {decodeFromBase64(testCase && testCase?.output)}
         </Typography>
         <Typography variant="body2" mt={2}>
           {/* Your Output: {testCase.your_output && decodeFromBase64(testCase.your_output)} */}
-          Your Output: {testCase.your_output && testCase.your_output}
+          Your Output: {testCase.your_output && testCase?.your_output}
         </Typography>
       </CardContent>
     </Card>
@@ -94,6 +95,7 @@ const TestCaseCard = ({ testCase, index }) => {
 
 export default function Home({ params }) {
   const { user } = useStudentAuth()
+  console.log("heyy usr", user);
   const [lang, setLang] = useState(langs[0]);
   const [selectVal, setSelectVal] = useState(1);
   const [cCode, setCCode] = useLocalStorage(
@@ -128,6 +130,7 @@ export default function Home({ params }) {
     `testcase_${params.id}_${params.questionId}`,
     "1\n0"
   );
+  console.log("custom", customTestcase);
   const [sampleTestcase, setSampleTestcase] = useLocalStorage(
     `sample_testcase_${params.id}_${params.questionId}`,
     []
@@ -267,7 +270,8 @@ export default function Home({ params }) {
         source_code: encodeToBase64(availableCodes[selectVal]),
         language_id: langs_ids[selectVal],
         qstnid: parseInt(params.questionId),
-        "userid": parseInt(user.payload.id),
+        "userid": parseInt(user.payload.userId),
+        // "userid": parseInt(user.payload.id),
         "testId": parseInt(params.id)
       });
 
@@ -275,10 +279,10 @@ export default function Home({ params }) {
       api.defaults.headers.Authorization = `Bearer ${token}`;
       try {
         const response = await api.post("submission/submit", data);
-        console.log(response.data);
+        console.log("res", response.data);
         setResult(response?.data?.finalStatus)
         setAlignment("submit")
-        console.log(alignment);
+        console.log("allginment", alignment);
         setTestcaseStatus(response?.data?.finalStatus == "Accepted" ? "Passed" : "Failed")
         setPassed(response?.data?.finalStatus == "Accepted" ? "success" : "error")
       } catch (error) {
@@ -488,6 +492,7 @@ export default function Home({ params }) {
           <Box
             sx={{ bgcolor: "#cfe8fc", width: "100%", height: "100%", ml: 1 }}
           >
+
             {/* {console.log(cppCode) } */}
             <AceEditor
               onChange={(value) => {
@@ -526,7 +531,7 @@ export default function Home({ params }) {
                     sx={{ width: "8rem" }}
                     value="result"
                     onClick={(e) => {
-                      setAlignment(e.target.value);
+                      setAlignment(e?.target?.value);
                     }}
                   >
                     Result
@@ -576,20 +581,30 @@ export default function Home({ params }) {
                   display={"flex"}
                   justifyContent={"center"}
                   alignItems={"center"}
-                  sx={{ marginTop: 1, minHeight: "100%", width: "80%" }}
+                  sx={{
+                    marginTop: 1,
+                    minHeight: "100%",
+                    width: "100%",
+                    borderRadius: 0,
+                    backgroundColor: testcaseStatus !== "Passed" ? "#FFCDD2" : "#C8E6C9",
+                    padding: 2,
+                    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 >
                   {testcaseStatus !== "Passed" ? (
                     <WarningIcon color="error" sx={{ mr: 1 }} />
                   ) : (
                     <CheckCircleIcon color="success" sx={{ mr: 1 }} />
                   )}
-                  <TextField
-                    value={testcaseStatus !== "Passed" ? "Testcases not Passed" : "Testcases Passed"}
-                    disabled
-                    variant="standard"
-                    sx={{ width: "100%" }}
-                  />
+                  <Typography
+                    variant="body1"
+                    color={testcaseStatus !== "Passed" ? "error" : "success"}
+                    fontWeight="bold"
+                  >
+                    {testcaseStatus !== "Passed" ? "Testcases Failed" : "Testcases Passed"}
+                  </Typography>
                 </Box>
+
               )}
             </Box>
           </Box>

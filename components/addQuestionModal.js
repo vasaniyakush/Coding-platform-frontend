@@ -35,7 +35,7 @@ function LeftPanel({ setAddQuestionOpen, toggleRefresh, testId }) {
   return (
     <Box
       sx={{
-        width: "50%",
+        width: "100%",
         maxHeight: "70vh",
         padding: "16px",
         overflowY: "auto",
@@ -78,7 +78,7 @@ export default function AddQuestionModal({ setAddQuestionOpen, toggleRefresh, te
       <Container maxWidth="xl" sx={{ mb: 4, maxHeight: "80vh" }}>
         <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
           <Typography component="h1" variant="h4" align="center">
-            Edit Question Data
+            ADD Question Data
           </Typography>
           <Divider />
           <Grid container spacing={0}>
