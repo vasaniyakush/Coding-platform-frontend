@@ -163,13 +163,13 @@ export default function PageNav({ children }) {
           </Typography>
           <Box sx={{ flexGrow: 1, mr: 10 }} />
           {/* </Box> */}
-          <Image
+          {/* <Image
             src={skit_logo}
             width={50}
             height={50}
             alt="green iguana"
             style={{ left: "0" }}
-          />
+          /> */}
         </Toolbar>
       </AppBar>
       {isAuthenticated ? (

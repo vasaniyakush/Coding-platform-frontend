@@ -61,17 +61,17 @@ export default function Home({ openTab }) {
       <AppBar position="fixed">
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            SKIT College Online Examination Platform
+            SERVER SIDE CODE PROCESSING
           </Typography>
           <Box sx={{ flexGrow: 1, mr: 10 }} />
           {/* </Box> */}
-          <Image
+          {/* <Image
             src={skit_logo}
             width={50}
             height={50}
             alt="green iguana"
             style={{ left: "0" }}
-          />
+          /> */}
         </Toolbar>
       </AppBar>
       <Grid mt={"4rem"} item xs={6} md={6} lg={6}>
@@ -137,8 +137,8 @@ export default function Home({ openTab }) {
                     textDecoration: "underline",
                   }}
                   gutterBottom
-                  // variant="h5"
-                  // component="a"
+                // variant="h5"
+                // component="a"
                 >
                   {address}
                 </Typography>
