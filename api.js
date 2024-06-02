@@ -10,10 +10,11 @@ import Axios from "axios";
 //   development: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
 //   production: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
 // };
+console.log(process.env.NODE_ENV);
 let urls = {
-  test: `https://7q0xhxzq-8080.inc1.devtunnels.ms/`,
-  development: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
-  production: "https://7q0xhxzq-8080.inc1.devtunnels.ms/",
+  test: "https://coding-platform-backend.onrender.com/",
+  development: "https://coding-platform-backend.onrender.com/",
+  production: "https://coding-platform-backend.onrender.com/",
   // test: `http://127.0.0.1:8080/`,
   // development: "http://127.0.0.1:8080/",
   // production: "http://127.0.0.1:8080/",
